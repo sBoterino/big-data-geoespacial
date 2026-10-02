@@ -314,8 +314,8 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   Kaggle ni cachés. Falta invitar colaboradores. El ruleset `proteger-main` se preparó pero no
   se guardó: el equipo decidió no activarlo porque no es un requisito explícito; ramas, PR y
   revisión siguen siendo obligatorios como práctica de trabajo.
-- **Registro académico:** borrador con cifras reales creado en
-  `docs/registro_dataset_docente.md`. Falta completar integrantes y enviarlo.
+- **Registro académico:** borrador con cifras reales y los tres integrantes creado en
+  `docs/registro_dataset_docente.md`. Falta enviarlo al docente.
 - **F2, archivos escritos (sin ejecutar en Docker todavía):**
   - `docker-compose.yml`: mongodb, spark-master, spark-worker, dask-scheduler, dask-worker-1,
     dask-worker-2, api; `dask-job` en el perfil `jobs`; `jenkins` y `smee` en el perfil `ci`.
@@ -336,7 +336,7 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
 
 ## Pendiente
-- [ ] F0: completar los nombres y enviar al docente el registro del dataset ya verificado.
+- [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores, sincronizar una copia local normal con el remoto y completar la
   asignación de roles de la sección 10.
 - [ ] **F2: seguir `docs/guia_fase2.md` y validar el Gate 2 ejecutándolo de verdad.**
