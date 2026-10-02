@@ -143,15 +143,16 @@ docker compose logs -f smee
 
 ---
 
-## Paso 6 — Proteger `main`
+## Paso 6 — Acordar el flujo de `main`
 
-En **Settings → Branches → Add branch protection rule** (o *Rulesets*), para `main`:
-- ✅ Require a pull request before merging.
-- ✅ Require approvals: 1.
+El equipo decidió no activar un ruleset porque la protección técnica de la rama no es un
+requisito explícito de la rúbrica. Aun así, el flujo exigido para todo cambio es:
+- ✅ trabajar en una rama;
+- ✅ abrir un pull request hacia `main`;
+- ✅ obtener al menos una revisión de otro integrante antes del merge.
 
-> En cuentas gratuitas, la protección de ramas en repos **privados** requiere GitHub Pro. Los
-> estudiantes lo tienen gratis con el GitHub Student Developer Pack. La otra opción es hacer el
-> repositorio público. Si no se puede proteger, igual deben trabajar siempre con PRs.
+Si el docente solicita protección técnica, se puede activar después mediante un *Ruleset* para
+la rama predeterminada con un PR y una aprobación obligatorios.
 
 ---
 

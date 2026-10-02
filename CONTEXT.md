@@ -1,11 +1,14 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v9 (2-oct-2026)
+## Contexto maestro transferible entre IAs — v10 (2-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
 >
+> **Cambios en v10:** se decidió no activar un ruleset de protección porque no es un requisito
+> explícito de la rúbrica. El equipo mantiene el flujo obligatorio de ramas, PR y revisión.
+>
 > **Cambios en v9:** Git para Windows instalado y repositorio público poblado con los 45 archivos
-> auditados. Datos, entorno virtual y credenciales quedaron excluidos. Falta proteger `main`.
+> auditados. Datos, entorno virtual y credenciales quedaron excluidos.
 >
 > **Cambios en v8:** repositorio público creado en GitHub; permanece vacío porque Git todavía
 > no está instalado o disponible en el `PATH` de la terminal normal de Windows.
@@ -143,7 +146,7 @@ conexión. Pero no se espera respuesta para avanzar.
 # 4. ARQUITECTURA
 
 ```text
- Developer ──push/PR──▶ GITHUB (main protegida, Jenkinsfile)
+ Developer ──push/PR──▶ GITHUB (flujo por PR acordado, Jenkinsfile)
                             │ webhook → smee.io → servicio smee (sin exponer Jenkins, D8)
                             ▼
                      JENKINS (contenedor con Docker CLI + compose,
@@ -299,7 +302,7 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - **F1 local:** base del repositorio (estructura, `.gitignore`, `.gitattributes`, `.env.example`,
   README, `docs/decisiones.md`, `scripts/verificar_dataset.py`). Git fue iniciado localmente en
   la rama `main`; `.venv/`, `data/` y `__pycache__/` aparecen ignorados. Falta el primer commit,
-  crear el repositorio remoto y proteger `main`. La auditoría previa encontró 44 archivos
+  crear el repositorio remoto. La auditoría previa encontró 44 archivos
   candidatos: incluye el JSON de evidencia y excluye datos, entorno virtual y token. El sandbox
   de Codex no permite escribir en `.git`, por lo que `git add` y el commit deben hacerse desde
   la terminal normal del usuario.
@@ -308,7 +311,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   Como el sandbox no pudo usar las credenciales HTTPS de Windows, la publicación se hizo con la
   conexión oficial de GitHub: `main` contiene los 45 archivos auditados en el commit
   `eaea454cca7a26ece822aad87ef6bcbdcb8dc113`. No se publicaron `data/`, `.venv/`, el token de
-  Kaggle ni cachés. Falta invitar colaboradores y proteger `main`.
+  Kaggle ni cachés. Falta invitar colaboradores. El ruleset `proteger-main` se preparó pero no
+  se guardó: el equipo decidió no activarlo porque no es un requisito explícito; ramas, PR y
+  revisión siguen siendo obligatorios como práctica de trabajo.
 - **Registro académico:** borrador con cifras reales creado en
   `docs/registro_dataset_docente.md`. Falta completar integrantes y enviarlo.
 - **F2, archivos escritos (sin ejecutar en Docker todavía):**
@@ -332,8 +337,8 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 
 ## Pendiente
 - [ ] F0: completar los nombres y enviar al docente el registro del dataset ya verificado.
-- [ ] F1: invitar colaboradores, proteger `main`, sincronizar una copia local normal con el
-  remoto y completar la asignación de roles de la sección 10.
+- [ ] F1: invitar colaboradores, sincronizar una copia local normal con el remoto y completar la
+  asignación de roles de la sección 10.
 - [ ] **F2: seguir `docs/guia_fase2.md` y validar el Gate 2 ejecutándolo de verdad.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 escrita, sin validar.**
@@ -348,7 +353,7 @@ distintas; una rama solo se integra a `main` cuando pasa su gate, y el pipeline 
 | Fecha | Fase | Gate (criterio verificable) |
 |---|---|---|
 | 30-sep | **F0 Definición** | Dataset verificado con el script y registrado con el docente; D1–D6 cerradas |
-| 30-sep | **F1 Repositorio y entorno** | Repo en GitHub con la base, `main` protegida, todos clonan y tienen `.env` local |
+| 30-sep | **F1 Repositorio y entorno** | Repo en GitHub con la base, flujo de ramas y PR acordado, todos clonan y tienen `.env` local |
 | 1–2 oct | **F2 Esqueleto de infraestructura y CI/CD** | `docker compose up` levanta Mongo, Spark (1+1), Dask (1+2), Flask y Jenkins; los servicios se ven entre sí; push → webhook → Jenkins → build → pytest → deploy de `/health`; **un test que falla a propósito bloquea el deploy** (con captura) |
 | 2–3 oct | **F3 Modelo MongoDB y datos semilla** | Colección con GeoJSON válido, 2dsphere creado, datos semilla cargados y consulta `$near` manual correcta |
 | 3–5 oct | **F4 Ingesta Dask** (paralela) | Descarga automática desde el pipeline; al menos 1 M de documentos limpios cargados; conteos antes y después de cada regla de limpieza registrados; segunda ejecución sin recarga |
@@ -440,8 +445,8 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
    respuesta para continuar; D7 sigue como verificada pero no aprobada hasta el registro.
 2. Asignar los cuatro componentes de la sección 10 entre los tres integrantes y definir revisores.
    Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
-3. Invitar a los otros dos integrantes en GitHub y proteger `main` con un ruleset que exija pull
-   request y una aprobación, bloquee force-push y evite eliminar la rama.
+3. Invitar a los otros dos integrantes en GitHub. No activar el ruleset de `main`; exigir ramas,
+   pull request y una revisión como norma del equipo y conservar la evidencia de los PR.
 4. Sincronizar una copia local normal desde
    `https://github.com/sBoterino/big-data-geoespacial.git` para que el equipo trabaje con Git.
 5. Seguir **`docs/guia_fase2.md` paso a paso** (pasos 0 a 8) desde una terminal con Docker.

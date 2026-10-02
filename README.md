@@ -86,7 +86,8 @@ docs/         Decisiones, evidencias e informe
 
 ## Flujo de trabajo en Git
 
-- `main` está protegida: solo se modifica mediante pull request con al menos una revisión.
+- Por acuerdo del equipo, `main` solo se modifica mediante pull request con al menos una revisión.
+  No hay un ruleset activo porque no es un requisito explícito de la rúbrica.
 - Ramas por componente: `feature/ingest-dask`, `feature/spark-agg`, `feature/api-flask`, etc.
 - Cada merge a `main` dispara el webhook → Jenkins → build, pruebas y despliegue.
 - Si una prueba falla, no hay despliegue.

@@ -220,7 +220,7 @@ conversación con Claude y adjuntar:
 
 **Objetivo:** Gate 2 aprobado, con el webhook funcionando y el bloqueo de deploy demostrado.
 
-### Paso 3.1 — Webhook, protección de `main` y prueba completa [INFRA] ⏱️ 1,5 h
+### Paso 3.1 — Webhook, flujo por PR y prueba completa [INFRA] ⏱️ 1,5 h
 Seguir `docs/guia_fase2.md` **Pasos 5, 6, 7 y 8**.
 
 ✅ Checklist completo del **Gate 2** de la guía.
