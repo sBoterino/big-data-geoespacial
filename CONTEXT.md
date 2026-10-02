@@ -1,8 +1,11 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v8 (2-oct-2026)
+## Contexto maestro transferible entre IAs — v9 (2-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v9:** Git para Windows instalado y repositorio público poblado con los 45 archivos
+> auditados. Datos, entorno virtual y credenciales quedaron excluidos. Falta proteger `main`.
 >
 > **Cambios en v8:** repositorio público creado en GitHub; permanece vacío porque Git todavía
 > no está instalado o disponible en el `PATH` de la terminal normal de Windows.
@@ -301,9 +304,11 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   de Codex no permite escribir en `.git`, por lo que `git add` y el commit deben hacerse desde
   la terminal normal del usuario.
 - **F1 remoto:** repositorio público creado en
-  `https://github.com/sBoterino/big-data-geoespacial`. Sigue vacío. La terminal normal devolvió
-  `git no se reconoce`; no hay instalación de Git en las rutas habituales. Falta instalar Git,
-  abrir una terminal nueva, configurar la identidad real, crear el commit y hacer push.
+  `https://github.com/sBoterino/big-data-geoespacial`. Git para Windows 2.53.0 fue instalado.
+  Como el sandbox no pudo usar las credenciales HTTPS de Windows, la publicación se hizo con la
+  conexión oficial de GitHub: `main` contiene los 45 archivos auditados en el commit
+  `eaea454cca7a26ece822aad87ef6bcbdcb8dc113`. No se publicaron `data/`, `.venv/`, el token de
+  Kaggle ni cachés. Falta invitar colaboradores y proteger `main`.
 - **Registro académico:** borrador con cifras reales creado en
   `docs/registro_dataset_docente.md`. Falta completar integrantes y enviarlo.
 - **F2, archivos escritos (sin ejecutar en Docker todavía):**
@@ -327,9 +332,8 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 
 ## Pendiente
 - [ ] F0: completar los nombres y enviar al docente el registro del dataset ya verificado.
-- [ ] F1: instalar Git para Windows, configurar la identidad del integrante que hará el primer
-  commit, crear el commit, subirlo al repositorio público ya creado y proteger `main`; completar
-  la asignación de roles de la sección 10.
+- [ ] F1: invitar colaboradores, proteger `main`, sincronizar una copia local normal con el
+  remoto y completar la asignación de roles de la sección 10.
 - [ ] **F2: seguir `docs/guia_fase2.md` y validar el Gate 2 ejecutándolo de verdad.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 escrita, sin validar.**
@@ -405,7 +409,7 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 - [ ] Flask expone los 3 endpoints mínimos.
 - [ ] Hay webhook de GitHub hacia Jenkins, y un test fallido bloquea el deploy (con evidencia).
 - [ ] La comparación Dask vs Spark tiene mediciones propias.
-- [ ] Hay README, `docker-compose.yml` y `Jenkinsfile` en el repositorio.
+- [x] Hay README, `docker-compose.yml` y `Jenkinsfile` en el repositorio.
 - [ ] El informe tiene 10 páginas o menos.
 - [ ] El historial de commits refleja a todos los integrantes.
 - [ ] Todos pueden hacer un cambio en vivo y explicar el sistema completo.
@@ -435,15 +439,15 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 1. Enviar al docente el texto ya completado en `docs/registro_dataset_docente.md`. No esperar
    respuesta para continuar; D7 sigue como verificada pero no aprobada hasta el registro.
 2. Asignar los cuatro componentes de la sección 10 entre los tres integrantes y definir revisores.
-   Configurar `user.name` y `user.email` del
-   integrante que hará el primer commit; no atribuir commits a una IA.
-3. Instalar Git para Windows y abrir una terminal nueva. Revisar los archivos preparados, crear
-   el primer commit, agregar como `origin` el repositorio público ya creado
-   (`sBoterino/big-data-geoespacial`), subir `main`, invitar colaboradores y proteger la rama.
-4. Seguir **`docs/guia_fase2.md` paso a paso** (pasos 0 a 8) desde una terminal con Docker.
-5. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
-6. Marcar el checklist del Gate 2 y guardar las evidencias en `docs/evidencias/`.
-7. Con el Gate 2 aprobado, arrancar **en paralelo**:
+   Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
+3. Invitar a los otros dos integrantes en GitHub y proteger `main` con un ruleset que exija pull
+   request y una aprobación, bloquee force-push y evite eliminar la rama.
+4. Sincronizar una copia local normal desde
+   `https://github.com/sBoterino/big-data-geoespacial.git` para que el equipo trabaje con Git.
+5. Seguir **`docs/guia_fase2.md` paso a paso** (pasos 0 a 8) desde una terminal con Docker.
+6. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
+7. Marcar el checklist del Gate 2 y guardar las evidencias en `docs/evidencias/`.
+8. Con el Gate 2 aprobado, arrancar **en paralelo**:
    - F4: ingesta Dask. Requiere el JSON de la verificación del dataset.
    - F5: consultas y API sobre `eventos_semilla`.
    - F6: agregaciones Spark, partiendo de `check_conexion.py`.
