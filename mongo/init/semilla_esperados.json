@@ -1,0 +1,57 @@
+{
+  "total": 300,
+  "near": [
+    {
+      "lat": 40.758,
+      "lon": -73.9855,
+      "radio_m": 1000,
+      "esperado": 120
+    },
+    {
+      "lat": 40.7003,
+      "lon": -73.99,
+      "radio_m": 500,
+      "esperado": 80
+    }
+  ],
+  "within": [
+    {
+      "poligono": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.996,
+              40.75
+            ],
+            [
+              -73.975,
+              40.75
+            ],
+            [
+              -73.975,
+              40.766
+            ],
+            [
+              -73.996,
+              40.766
+            ],
+            [
+              -73.996,
+              40.75
+            ]
+          ]
+        ]
+      },
+      "esperado": 120
+    }
+  ],
+  "orientacion": {
+    "_id": "semilla-0000",
+    "coordinates": [
+      -73.984936,
+      40.760696
+    ],
+    "nota": "coordinates[0] es longitud (~-73.98) y coordinates[1] latitud (~40.76)"
+  }
+}

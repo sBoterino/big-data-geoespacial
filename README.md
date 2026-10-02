@@ -106,4 +106,3 @@ enlace, según las condiciones del curso.
 - MongoDB Spark Connector: https://www.mongodb.com/docs/spark-connector/current/
 - smee-client: https://github.com/probot/smee-client
 - *(agregar a medida que se usen)*
-

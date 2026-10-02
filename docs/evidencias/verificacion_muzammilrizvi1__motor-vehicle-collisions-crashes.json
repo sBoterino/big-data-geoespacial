@@ -1,0 +1,22 @@
+{
+  "dataset": "muzammilrizvi1/motor-vehicle-collisions-crashes",
+  "bytes_totales": 420704526,
+  "archivos": {
+    "Motor_Vehicle_Collisions_-_Crashes.csv": {
+      "registros": 1972121,
+      "coord_nulas": 226028,
+      "coord_no_numericas": 0,
+      "coord_cero": 4115,
+      "fuera_de_rango": 106,
+      "validos": 1741872,
+      "col_lat": "LATITUDE",
+      "col_lon": "LONGITUDE",
+      "cols_fecha": [
+        "CRASH DATE",
+        "CRASH TIME"
+      ]
+    }
+  },
+  "registros_totales": 1972121,
+  "cumple_tamano": true
+}
