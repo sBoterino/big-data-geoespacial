@@ -1,8 +1,13 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v11 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v12 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v12:** WSL 3.0.1 quedó instalado después del reinicio. Se descargó el instalador
+> oficial de Docker Desktop para Windows x86-64 y se verificó su firma válida de Docker Inc.; la
+> instalación automática desde el entorno aislado terminó con código 1, por lo que debe ejecutarse
+> manualmente desde Windows.
 >
 > **Cambios en v11:** Git 2.56.0 quedó operativo y se clonó una copia local normal del repositorio
 > público. La verificación del equipo corrigió un dato anterior: Docker Desktop no está instalado
@@ -288,8 +293,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 # 8. ESTADO ACTUAL
 
 ## Completado
-- La comprobación del 4-oct-2026 no encontró Docker Desktop en el `PATH`, en las rutas habituales
-  ni en el registro de programas instalados. Debe instalarse antes de ejecutar el Gate 2.
+- WSL 3.0.1 está instalado. Docker Desktop todavía no aparece en el `PATH`, en las rutas habituales
+  ni en el registro de programas instalados. Su instalador oficial (627.791.792 bytes) quedó
+  descargado y con firma válida de Docker Inc.; debe ejecutarse manualmente antes del Gate 2.
 - Requisitos analizados; arquitectura v2 definida; decisiones D1–D6 y D8–D12 documentadas.
 - Candidatos de dataset investigados (sección 7).
 - **F0 técnico:** dataset principal descargado y perfilado; cumple el mínimo con 1.972.121
