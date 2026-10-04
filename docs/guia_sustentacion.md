@@ -35,6 +35,7 @@ seguir el despliegue y explicar por qué está construido así.
 | Ingesta idempotente | **Implementada; ejecución pendiente** | `ingest/pipeline_ingesta.py` | `ingesta_meta` y el conteo de Mongo deciden si se omite; `FORCE_RELOAD` permite recargar |
 | Validación de ramas sin afectar producción | **Implementada; ejecución pendiente** | Condiciones por `JOB_NAME` en `Jenkinsfile` | Solo `bdgeo-main` puede pasar por staging y despliegue; los jobs temporales usan etiquetas `validation-*` |
 | Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
+| Compatibilidad entre particiones y reducciones | **Corregida; validación pendiente** | `bdgeo-ingesta-test` #2 | Una muestra de una partición reveló que reducir escalares con `.sum()` no era estable; ahora se suman sus longitudes explícitamente |
 | Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
 | GeoJSON e índice 2dsphere | **Listo con datos semilla** | `mongo/init/01-init.js`, `02-semilla.js` | Validador, orden `[longitud, latitud]`, índices y resultados conocidos |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |

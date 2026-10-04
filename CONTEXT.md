@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v24 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v25 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v25:** el build #2 confirmó la distribución de `limpieza.py` y avanzó hasta el
+> conteo final. Detectó una reducción inestable de escalares con una sola partición. Se reemplazó
+> por suma explícita de longitudes y se añadieron dos pruebas; falta validarlo en el build #3.
 >
 > **Cambios en v24:** el build de muestra #1 validó Kaggle, imágenes, pruebas y dos workers. Falló
 > de forma segura al deserializar el grafo porque el scheduler no encontraba `limpieza.py`.
@@ -437,7 +441,11 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - **F4, muestra #1:** Kaggle confirmó el CSV de 420.704.526 bytes, API obtuvo 4 pruebas aprobadas,
   ingesta obtuvo 3 y Dask conectó 2 workers. La deserialización falló porque el scheduler no podía
   importar `limpieza.py`; el pipeline bloqueó las etapas posteriores. Se corrigió distribuyendo el
-  módulo con `Client.upload_file`. Corrección pendiente de validar en el build #2.
+  módulo con `Client.upload_file`, corrección confirmada en el build #2.
+- **F4, muestra #2:** `upload_file` funcionó y se reutilizó la caché. Falló antes de escribir en
+  MongoDB porque `map_partitions(len).sum()` intentó reducir un entero como serie al existir una
+  sola partición. Se creó `contar_filas`, que suma las longitudes materializadas, con pruebas para
+  una y varias particiones. Pendiente build #3.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.

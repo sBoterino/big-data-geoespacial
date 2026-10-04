@@ -60,6 +60,13 @@ def limitar_filas(dataframe: dd.DataFrame, limite: int) -> dd.DataFrame:
     return dd.concat(partes, interleave_partitions=True) if partes else dataframe.head(0, compute=False)
 
 
+def contar_filas(dataframe: dd.DataFrame) -> int:
+    """Cuenta filas sin aplicar una reducción de Series a escalares por partición."""
+
+    tamanos = dataframe.map_partitions(len).compute().tolist()
+    return int(sum(tamanos))
+
+
 def _insertar_particion(
     particion: pd.DataFrame, uri: str, base: str, coleccion: str, tamano_lote: int
 ) -> pd.DataFrame:
@@ -146,7 +153,7 @@ def ejecutar() -> None:
         limpio = limpio.drop_duplicates(subset=["collision_id"], keep="first")
         limpio = cliente_dask.persist(limpio)
         wait(limpio)
-        total_final = int(limpio.map_partitions(len).sum().compute())
+        total_final = contar_filas(limpio)
         reporte["R6_duplicado"] = antes_duplicados - total_final
         reporte["total_final"] = total_final
 
