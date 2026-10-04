@@ -44,10 +44,28 @@ Rama: `feature/ingesta-dask`
 - Falló la reducción `map_partitions(len).sum()` con una sola partición: Dask recibió un entero
   donde esperaba una serie. Ocurrió antes de vaciar o insertar en la colección.
 - Corrección aplicada: materializar únicamente las longitudes de las particiones y sumarlas en el
-  cliente. Se añadieron pruebas para una y varias particiones. Pendiente de validar en el build #3.
+  cliente. Se añadieron pruebas para una y varias particiones.
+
+## Tercera muestra real — build `bdgeo-ingesta-test` #3
+
+- Resultado: `SUCCESS`, iniciado automáticamente por el webhook.
+- API: 4 pruebas aprobadas y 1 intencionalmente omitida.
+- Ingesta: 5 pruebas aprobadas, incluidas una y varias particiones.
+- Kaggle: CSV de 420.704.526 bytes reconocido desde la caché.
+- Dask: 2 workers conectados; muestra procesada en 1 partición.
+- Entrada: 50.000 filas.
+- R1, coordenadas nulas/no numéricas: 3.888 descartadas.
+- R2, coordenadas `(0,0)`: 269 descartadas.
+- R3–R6: 0 descartadas en esta muestra.
+- Salida e inserción MongoDB: 45.843 documentos.
+- Duración de la ingesta: 5,684 segundos.
+- Integración Dask: 2 workers, cálculo distribuido y MongoDB, resultado `OK`.
+- Integración Spark: 300 documentos y grupos de control 120/80/100, resultado correcto.
+- Staging y despliegue: omitidos por la condición del job de rama.
+- Mensaje final: producción no fue modificada.
 
 ## Pendiente
 
-- Ejecutar una muestra real de 50.000 filas mediante la credencial protegida de Jenkins.
-- Verificar conteo, documento GeoJSON, índices y segunda ejecución omitida.
+- Ejecutar el build #4 y comprobar que la ingesta se omite por idempotencia.
+- Verificar directamente un documento GeoJSON y los índices de la colección.
 - Ejecutar la carga completa y conservar `reporte_limpieza.json`.

@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v25 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v26 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v26:** build de muestra #3 aprobado. Procesó 50.000 filas, descartó 3.888 por R1 y
+> 269 por R2, insertó 45.843 documentos en 5,684 s, pasó Dask/Spark y omitió el despliegue por ser
+> un job de rama. El próximo build debe demostrar idempotencia.
 >
 > **Cambios en v25:** el build #2 confirmó la distribución de `limpieza.py` y avanzó hasta el
 > conteo final. Detectó una reducción inestable de escalares con una sola partición. Se reemplazó
@@ -445,16 +449,21 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - **F4, muestra #2:** `upload_file` funcionó y se reutilizó la caché. Falló antes de escribir en
   MongoDB porque `map_partitions(len).sum()` intentó reducir un entero como serie al existir una
   sola partición. Se creó `contar_filas`, que suma las longitudes materializadas, con pruebas para
-  una y varias particiones. Pendiente build #3.
+  una y varias particiones. Corrección confirmada en el build #3.
+- **F4, muestra #3 aprobada:** 5 pruebas de ingesta pasaron. De 50.000 filas, R1 descartó 3.888,
+  R2 descartó 269 y R3–R6 no descartaron filas; MongoDB recibió 45.843 documentos en 5,684 s.
+  Dask confirmó 2 workers y Spark conservó los controles 120/80/100. Staging y despliegue se
+  omitieron por condición y el build terminó `SUCCESS` sin modificar producción.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
 - [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
 - [x] **F2: Gate 2 aprobado de punta a punta, incluido webhook y bloqueo del despliegue.**
-- [ ] **F4: ejecutar muestra de 50.000 filas, corregir hallazgos y luego cargar el dataset completo.**
+- [x] **F4: muestra de 50.000 filas aprobada.**
+- [ ] **F4: demostrar idempotencia, verificar GeoJSON/índices y cargar el dataset completo.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 muestra aprobada.**
 
 ---
 

@@ -31,11 +31,11 @@ seguir el despliegue y explicar por qué está construido así.
 | Un test fallido bloquea el despliegue | **Listo** | Build #3 y `gate2_cierre_2026-10-04.md` | Con `FORZAR_FALLO=true`, pytest falla, las etapas posteriores se omiten y producción queda en versión 2 |
 | Credenciales seguras | **Listo** | Jenkins y auditoría del historial | Mongo usa `mongo-root`; Kaggle usa `kaggle-api-token`; `.env` está ignorado y no hay tokens reales en Git |
 | Dask distribuido básico | **Listo como infraestructura** | `ingest/check_cluster.py` | Scheduler, dos workers, cálculo distribuido y lectura de 300 documentos semilla |
-| Reglas de limpieza R1–R6 | **Implementadas; datos reales pendientes** | `ingest/limpieza.py`, 3 tests Docker | Cada descarte se aplica en orden y queda contado de forma exclusiva; falta el reporte completo |
+| Reglas de limpieza R1–R6 | **Validadas en muestra; carga completa pendiente** | `bdgeo-ingesta-test` #3, 5 tests Docker | De 50.000 filas: R1 descartó 3.888, R2 descartó 269 y quedaron 45.843 documentos |
 | Ingesta idempotente | **Implementada; ejecución pendiente** | `ingest/pipeline_ingesta.py` | `ingesta_meta` y el conteo de Mongo deciden si se omite; `FORCE_RELOAD` permite recargar |
-| Validación de ramas sin afectar producción | **Implementada; ejecución pendiente** | Condiciones por `JOB_NAME` en `Jenkinsfile` | Solo `bdgeo-main` puede pasar por staging y despliegue; los jobs temporales usan etiquetas `validation-*` |
+| Validación de ramas sin afectar producción | **Demostrada** | `bdgeo-ingesta-test` #3 | Staging y despliegue se omitieron por condición; el job terminó correctamente sin modificar producción |
 | Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
-| Compatibilidad entre particiones y reducciones | **Corregida; validación pendiente** | `bdgeo-ingesta-test` #2 | Una muestra de una partición reveló que reducir escalares con `.sum()` no era estable; ahora se suman sus longitudes explícitamente |
+| Compatibilidad entre particiones y reducciones | **Corregida y validada** | `bdgeo-ingesta-test` #3 | Cinco pruebas y la muestra real confirmaron el conteo explícito de longitudes por partición |
 | Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
 | GeoJSON e índice 2dsphere | **Listo con datos semilla** | `mongo/init/01-init.js`, `02-semilla.js` | Validador, orden `[longitud, latitud]`, índices y resultados conocidos |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |
