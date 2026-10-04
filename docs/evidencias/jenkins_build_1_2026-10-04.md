@@ -25,4 +25,3 @@ Duración: 1 min 52 s
 
 - Conectar el webhook de GitHub mediante smee.io y demostrar ejecución automática.
 - Ejecutar con `FORZAR_FALLO=true` y demostrar que la versión desplegada no cambia.
-

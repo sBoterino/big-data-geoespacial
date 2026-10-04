@@ -214,4 +214,3 @@ Con todo marcado, actualizar CONTEXT.md (sección 8) y pasar a las Fases 3–6.
 | El worker de Spark no se registra | El master aún no estaba listo, o hay un conflicto de hostname | `docker compose logs spark-worker`; `docker compose restart spark-worker` |
 | Falla el build de la imagen de Spark al descargar jars | Sin internet, o versión inexistente en Maven | Revisar la conexión y los `ARG` de versión en `spark/Dockerfile` |
 | `kaggle ... 401 Unauthorized` | Token incorrecto o expirado | Generar un token nuevo en Kaggle y actualizar la credencial y el `.env` |
-

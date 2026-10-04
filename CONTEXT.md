@@ -529,4 +529,3 @@ Al cerrar cada fase o gate, actualizar:
 - la evidencia en `docs/evidencias/`;
 - la sección 14 (próxima acción);
 - el número de versión y la fecha del encabezado.
-
