@@ -53,5 +53,7 @@ MongoDB Spark Connector.
 
 - Jenkins se construyó correctamente en 242,7 segundos y el contenedor quedó iniciado en el
   puerto 8080. La interfaz respondió como Jenkins 2.541.3 y redirigió a la autenticación.
-- Completar el asistente inicial de Jenkins y configurar sus credenciales.
+- El asistente inicial quedó completado, se creó el usuario administrador y el panel principal
+  quedó disponible en `http://localhost:8080/`.
+- Configurar las credenciales internas de MongoDB y Kaggle.
 - Configurar el webhook, demostrar el despliegue correcto y el bloqueo con `FORZAR_FALLO`.
