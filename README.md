@@ -7,7 +7,7 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
-> Estado: **Fase 2 — esqueleto de infraestructura y CI/CD** (pendiente de validar el Gate 2).
+> Estado: **Gate 2 aprobado; Fase 4 — ingesta Dask en validación**.
 > Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset
@@ -50,6 +50,13 @@ docker compose run --rm dask-job python check_cluster.py
 docker compose exec spark-master /opt/spark/bin/spark-submit /opt/jobs/check_conexion.py
 ```
 
+Probar las reglas de limpieza dentro de la imagen de ingesta:
+
+```bash
+docker build --target test -t bdgeo-ingest-test:dev ingest
+docker run --rm bdgeo-ingest-test:dev
+```
+
 Probar el perfilador con datos sintéticos (requiere `pandas`, pero no Kaggle ni credenciales):
 
 ```bash
@@ -88,7 +95,7 @@ docs/         Decisiones, evidencias e informe
 
 - Por acuerdo del equipo, `main` solo se modifica mediante pull request con al menos una revisión.
   No hay un ruleset activo porque no es un requisito explícito de la rúbrica.
-- Ramas por componente: `feature/ingest-dask`, `feature/spark-agg`, `feature/api-flask`, etc.
+- Ramas por componente: `feature/ingesta-dask`, `feature/spark-agg`, `feature/api-flask`, etc.
 - Cada merge a `main` dispara el webhook → Jenkins → build, pruebas y despliegue.
 - Si una prueba falla, no hay despliegue.
 

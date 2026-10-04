@@ -31,6 +31,9 @@ seguir el despliegue y explicar por qué está construido así.
 | Un test fallido bloquea el despliegue | **Listo** | Build #3 y `gate2_cierre_2026-10-04.md` | Con `FORZAR_FALLO=true`, pytest falla, las etapas posteriores se omiten y producción queda en versión 2 |
 | Credenciales seguras | **Listo** | Jenkins y auditoría del historial | Mongo usa `mongo-root`; Kaggle usa `kaggle-api-token`; `.env` está ignorado y no hay tokens reales en Git |
 | Dask distribuido básico | **Listo como infraestructura** | `ingest/check_cluster.py` | Scheduler, dos workers, cálculo distribuido y lectura de 300 documentos semilla |
+| Reglas de limpieza R1–R6 | **Implementadas; datos reales pendientes** | `ingest/limpieza.py`, 3 tests Docker | Cada descarte se aplica en orden y queda contado de forma exclusiva; falta el reporte completo |
+| Ingesta idempotente | **Implementada; ejecución pendiente** | `ingest/pipeline_ingesta.py` | `ingesta_meta` y el conteo de Mongo deciden si se omite; `FORCE_RELOAD` permite recargar |
+| Validación de ramas sin afectar producción | **Implementada; ejecución pendiente** | Condiciones por `JOB_NAME` en `Jenkinsfile` | Solo `bdgeo-main` puede pasar por staging y despliegue; los jobs temporales usan etiquetas `validation-*` |
 | Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
 | GeoJSON e índice 2dsphere | **Listo con datos semilla** | `mongo/init/01-init.js`, `02-semilla.js` | Validador, orden `[longitud, latitud]`, índices y resultados conocidos |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |
@@ -78,6 +81,20 @@ que el worker se registra y que Spark lee y escribe en MongoDB mediante el conec
 El scheduler organiza el grafo de tareas y reparte las particiones. Los dos workers realizan el
 cálculo. `check_cluster.py` comprueba que ambos están conectados y ejecuta una media distribuida.
 
+### ¿Cómo se justifican técnicamente las reglas de limpieza?
+
+R1 elimina coordenadas nulas o no numéricas porque no forman un punto. R2 elimina `(0,0)` porque
+es un valor centinela fuera de NYC. R3 aplica los rangos mundiales WGS84. R4 usa el bounding box
+de NYC para detectar coordenadas globalmente válidas pero incompatibles con la fuente. R5 exige
+fecha y hora para los agregados temporales. R6 elimina IDs repetidos para evitar doble conteo.
+Los conteos reales se añadirán después de la carga completa.
+
+### ¿Cómo evita el pipeline recargar casi dos millones de filas en cada build?
+
+`ingesta_meta` guarda dataset, tamaño de muestra, estado y total final. Si el registro está
+completo y el conteo de `eventos` coincide, la ejecución imprime `Ingesta omitida`. Solo se
+recarga cuando cambia la configuración o `FORCE_RELOAD=true`.
+
 ### ¿Por qué GeoJSON usa `[longitud, latitud]`?
 
 GeoJSON expresa coordenadas como `[x, y]`, es decir `[longitud, latitud]`. Invertirlas ubicaría
@@ -116,7 +133,7 @@ lo demostró: no se ejecutó `Despliegue` y la API siguió en la versión 2.
 |---|---|
 | ¿Por qué Dask para ingesta y Spark para agregaciones? | Añadir experiencia y mediciones reales de F4, F6 y F8 |
 | ¿Cuántas particiones Dask usaron? | Registrar el número real durante la ingesta completa |
-| ¿Cómo justifican cada regla de limpieza? | Tabla antes/después para nulos, no numéricos, `(0,0)`, rangos y bounding box |
+| ¿Cuántos registros eliminó cada regla de limpieza? | Añadir el reporte real de la carga completa |
 | Diferencia práctica entre `$near`, `$geoWithin` y `$geoNear` | Implementar y medir F5 |
 | ¿Cómo verificaron los resultados de Spark? | Sumas de control y cruce de hotspots con MongoDB en F6 |
 | ¿Cuándo conviene Dask o Spark? | Tiempos y memoria propios del benchmark F8 |

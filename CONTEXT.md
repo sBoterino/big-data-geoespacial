@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v22 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v23 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v23:** F4 implementada en `feature/ingesta-dask`: descarga cacheada de Kaggle,
+> limpieza R1–R6, GeoJSON, carga Dask por lotes, Parquet, metadatos idempotentes y etapa Jenkins.
+> Las 3 pruebas sintéticas pasaron dentro de Docker; falta ejecutar la muestra de 50.000 filas.
 >
 > **Cambios en v22:** se creó `docs/guia_sustentacion.md`, que cruza la sección 6 del enunciado
 > con las evidencias actuales, separa lo demostrable de lo pendiente y mantiene un banco vivo de
@@ -417,12 +421,22 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   `docs/evidencias/gate2_cierre_2026-10-04.md`.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
+- **F4, implementación en rama:** `ingest/descarga.py` descarga con la API de Kaggle y valida su
+  caché; `limpieza.py` aplica R1–R6 en orden y construye GeoJSON; `pipeline_ingesta.py` coordina
+  dos workers, deduplica globalmente, carga MongoDB por lotes, recrea índices, exporta Parquet y
+  registra `ingesta_meta`. Jenkins construye y ejecuta la imagen de tests y añade la etapa
+  `Ingesta (idempotente)`. Solo el job `bdgeo-main` puede desplegar; un job de rama usa etiquetas
+  `validation-*`, procesa 50.000 filas y valida sin modificar producción; `bdgeo-main` conserva
+  `INGEST_MAX_ROWS=0` para la carga completa. `docker compose config --quiet` pasó; la imagen de
+  pruebas se construyó y obtuvo 3 pruebas aprobadas en 0,29 s. Falta muestra real, idempotencia y
+  carga completa.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
 - [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
 - [x] **F2: Gate 2 aprobado de punta a punta, incluido webhook y bloqueo del despliegue.**
+- [ ] **F4: ejecutar muestra de 50.000 filas, corregir hallazgos y luego cargar el dataset completo.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada.**
 

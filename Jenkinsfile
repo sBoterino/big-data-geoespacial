@@ -27,11 +27,17 @@ pipeline {
             description: 'Activa un test que falla a propósito para demostrar que NO se despliega')
         booleanParam(name: 'VERIFICAR_KAGGLE', defaultValue: true,
             description: 'Comprueba que la credencial de Kaggle funciona y el dataset es accesible')
+        booleanParam(name: 'FORCE_RELOAD', defaultValue: false,
+            description: 'Fuerza la recarga completa del dataset aunque ya exista una ingesta válida')
     }
 
     environment {
-        API_TAG        = "${env.BUILD_NUMBER}"
-        STAGING        = "bdgeo-api-staging-${env.BUILD_NUMBER}"
+        // Solo bdgeo-main usa etiquetas numéricas de producción. Los jobs temporales de ramas
+        // usan un prefijo para no sobrescribir imágenes que sirven como rollback.
+        API_TAG        = "${env.JOB_NAME == 'bdgeo-main' ? env.BUILD_NUMBER : 'validation-' + env.BUILD_NUMBER}"
+        STAGING        = "bdgeo-api-staging-${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}"
+        // La rama se prueba primero con una muestra; el job de producción cumple la carga completa.
+        INGEST_MAX_ROWS = "${env.JOB_NAME == 'bdgeo-main' ? '0' : '50000'}"
         MONGO_CRED     = credentials('mongo-root')   // expone MONGO_CRED_USR y MONGO_CRED_PSW (enmascarados)
         KAGGLE_DATASET = 'muzammilrizvi1/motor-vehicle-collisions-crashes'
         INFRA          = 'mongodb spark-master spark-worker dask-scheduler dask-worker-1 dask-worker-2'
@@ -53,6 +59,7 @@ pipeline {
                     . jenkins/ci-env.sh
                     docker compose build
                     docker build --target test -t bdgeo-api-test:${API_TAG} api
+                    docker build --target test -t bdgeo-ingest-test:${API_TAG} ingest
                 '''
             }
         }
@@ -60,6 +67,7 @@ pipeline {
         stage('Pruebas unitarias (pytest)') {
             steps {
                 sh 'docker run --rm -e FORZAR_FALLO=${FORZAR_FALLO} bdgeo-api-test:${API_TAG}'
+                sh 'docker run --rm bdgeo-ingest-test:${API_TAG}'
             }
         }
 
@@ -74,9 +82,6 @@ pipeline {
             }
         }
 
-        // Fase 4: aquí se agrega la etapa "Ingesta (idempotente)":
-        //   docker compose run --rm dask-job python -m pipeline_ingesta
-
         stage('Levantar servicios') {
             steps {
                 sh '''
@@ -84,6 +89,19 @@ pipeline {
                     docker compose up -d --wait --wait-timeout 240 ${INFRA}
                     docker compose ps
                 '''
+            }
+        }
+
+        stage('Ingesta (idempotente)') {
+            steps {
+                withCredentials([string(credentialsId: 'kaggle-api-token',
+                        variable: 'KAGGLE_API_TOKEN')]) {
+                    sh '''
+                        . jenkins/ci-env.sh
+                        FORCE_RELOAD=${FORCE_RELOAD} docker compose run --rm \
+                            -e KAGGLE_API_TOKEN dask-job python pipeline_ingesta.py
+                    '''
+                }
             }
         }
 
@@ -100,6 +118,7 @@ pipeline {
         }
 
         stage('Pruebas contra la API (staging)') {
+            when { expression { env.JOB_NAME == 'bdgeo-main' } }
             steps {
                 sh '''
                     . jenkins/ci-env.sh
@@ -113,6 +132,7 @@ pipeline {
         }
 
         stage('Despliegue') {
+            when { expression { env.JOB_NAME == 'bdgeo-main' } }
             steps {
                 sh '''
                     . jenkins/ci-env.sh
@@ -129,6 +149,7 @@ pipeline {
             sh '''
                 docker rm -f ${STAGING} >/dev/null 2>&1 || true
                 docker image rm bdgeo-api-test:${API_TAG} >/dev/null 2>&1 || true
+                docker image rm bdgeo-ingest-test:${API_TAG} >/dev/null 2>&1 || true
             '''
         }
         success {
@@ -137,7 +158,13 @@ pipeline {
                 docker images bdgeo-api --format '{{.Tag}}' | grep -E '^[0-9]+$' | sort -n | head -n -5 \
                   | xargs -r -I{} docker image rm bdgeo-api:{} >/dev/null 2>&1 || true
             '''
-            echo "OK: build ${env.BUILD_NUMBER} desplegado."
+            script {
+                if (env.JOB_NAME == 'bdgeo-main') {
+                    echo "OK: build ${env.BUILD_NUMBER} desplegado."
+                } else {
+                    echo "OK: validación ${env.JOB_NAME} #${env.BUILD_NUMBER} aprobada; producción no fue modificada."
+                }
+            }
         }
         failure {
             echo "FALLO: el pipeline se detuvo y NO se desplegó la versión ${env.BUILD_NUMBER}. La versión anterior sigue activa."
