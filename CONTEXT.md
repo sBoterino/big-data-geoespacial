@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v19 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v20 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v20:** se creó el canal de smee, se levantó el reenviador y GitHub entregó el ping
+> a Jenkins con HTTP 200. La publicación de esta actualización sirve como prueba del primer push
+> real; falta confirmar que Jenkins inició automáticamente y ejecutar `FORZAR_FALLO`.
 >
 > **Cambios en v19:** se revocó el token de Kaggle expuesto y se creó `jenkins-bdgeo`; Jenkins
 > guarda `mongo-root` y `kaggle-api-token`. Se creó el job `bdgeo-main` contra `*/main` y el build
@@ -392,6 +396,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   confirmó 2 workers, media 0,5000 y 300 documentos; Spark leyó 300 con grupos 120/80/100;
   staging respondió `version=1-staging`; producción respondió `version=1`. Evidencia textual en
   `docs/evidencias/jenkins_build_1_2026-10-04.md`; la captura de Jenkins se conservó en la sesión.
+- **F2, webhook conectado:** canal de smee creado y guardado solo en `.env`; el contenedor
+  `bdgeo-smee-1` quedó conectado y reenvía a `http://jenkins:8080/github-webhook/`. GitHub creó
+  el webhook activo para eventos `push` con `application/json`; el ping llegó a Jenkins con
+  respuesta HTTP 200. Evidencia en `docs/evidencias/webhook_2026-10-04.md`.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
 
@@ -399,10 +407,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
 - [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
-- [ ] **F2: conectar smee/GitHub y demostrar que `FORZAR_FALLO` bloquea el despliegue.**
+- [ ] **F2: confirmar el disparo automático de Jenkins y demostrar que `FORZAR_FALLO` bloquea el despliegue.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 funcional
-por ejecución manual; faltan webhook y prueba negativa para cerrar el Gate 2.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 funcional;
+webhook conectado, falta confirmar el build automático y ejecutar la prueba negativa.**
 
 ---
 
@@ -508,9 +516,9 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
    Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
 3. Invitar a los otros dos integrantes en GitHub. No activar el ruleset de `main`; exigir ramas,
    pull request y una revisión como norma del equipo y conservar la evidencia de los PR.
-4. Configurar smee.io y el webhook de GitHub siguiendo el paso 5 de `docs/guia_fase2.md`; verificar
-   que un push o merge a `main` inicia Jenkins sin pulsar el botón manualmente.
-5. Ejecutar el build parametrizado con `FORZAR_FALLO=true`, comprobar que queda rojo antes del
+4. Confirmar que el push documental de v20 inicia Jenkins sin pulsar el botón manualmente y que
+   el pipeline termina en verde con `/health` mostrando la nueva versión.
+5. Ejecutar después el build parametrizado con `FORZAR_FALLO=true`, comprobar que queda rojo antes del
    despliegue y que `/health` conserva `version=1`; guardar captura.
 6. Auditar que no haya secretos en el historial, completar el checklist y cerrar el Gate 2.
 7. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.

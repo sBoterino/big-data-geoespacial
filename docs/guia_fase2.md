@@ -139,7 +139,7 @@ docker compose logs -f smee
    - *Active:* ✅.
 5. GitHub envía un evento *ping*. Debe aparecer en la página del canal de smee y en los logs.
 
-- [ ] El ping llega a smee y aparece en los logs.
+- [x] El ping llega a smee y aparece en los logs.
 
 ---
 
