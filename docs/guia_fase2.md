@@ -13,7 +13,7 @@ problemas al final antes de seguir.
 ## Paso 0 — Preparación
 
 - [ ] Docker Desktop → Settings → Resources → Memory en **al menos 8 GB** (ideal 10–12 GB).
-- [ ] El repositorio de GitHub está creado y tiene la base subida.
+- [x] El repositorio de GitHub está creado y tiene la base subida.
 - [ ] En Windows, antes de clonar: `git config --global core.autocrlf false`.
       El `.gitattributes` fuerza LF, pero esto evita sorpresas.
 
@@ -38,9 +38,9 @@ La primera vez tarda varios minutos: descarga imágenes y el build de Spark baja
 desde Maven. Todo debe quedar en `running` o `healthy`.
 
 Verificar en el navegador:
-- [ ] Spark master en http://localhost:8081, que debe mostrar **1 worker ALIVE**.
-- [ ] Dashboard de Dask en http://localhost:8787, que debe mostrar **2 workers** en la pestaña Workers.
-- [ ] API en http://localhost:5000/health, que debe devolver `{"mongo":"ok","status":"ok",...}`.
+- [x] Spark master en http://localhost:8081, que debe mostrar **1 worker ALIVE**.
+- [x] Dashboard de Dask en http://localhost:8787, que debe mostrar **2 workers** en la pestaña Workers.
+- [x] API en http://localhost:5000/health, que debe devolver `{"mongo":"ok","status":"ok",...}`.
 
 Pruebas de integración entre contenedores:
 
@@ -53,7 +53,7 @@ docker compose exec spark-master /opt/spark/bin/spark-submit /opt/jobs/check_con
 #  -> "documentos leídos: 300 (esperado 300)"
 ```
 
-- [ ] Las dos pruebas terminan bien. **Guardar la salida en `docs/evidencias/`.**
+- [x] Las dos pruebas terminan bien. **Guardar la salida en `docs/evidencias/`.**
 
 ---
 
@@ -76,7 +76,7 @@ Comprobar que Jenkins puede usar Docker:
 docker compose exec jenkins docker ps
 ```
 
-- [ ] Lista los contenedores del proyecto.
+- [x] Lista los contenedores del proyecto.
 
 ---
 
@@ -91,7 +91,7 @@ Crear estas credenciales globales:
 | `kaggle-api-token` | *Secret text* | token `KGAT_...` generado en Kaggle |
 | `github-token` *(solo si el repo es privado)* | *Username with password* | usuario y fine-grained token con permiso *Contents: Read* |
 
-- [ ] Las credenciales están creadas con esos IDs exactos. El Jenkinsfile los busca por nombre.
+- [x] Las credenciales están creadas con esos IDs exactos. El Jenkinsfile los busca por nombre.
 
 ---
 
@@ -110,8 +110,8 @@ Crear estas credenciales globales:
 Guardar y pulsar **Build Now** una vez, a mano. El primer build registra los parámetros y el
 trigger del webhook. A partir de ahí el botón pasa a ser *Build with Parameters*.
 
-- [ ] El primer build termina en verde, con todas las etapas.
-- [ ] http://localhost:5000/health muestra `"version":"<número del build>"`.
+- [x] El primer build termina en verde, con todas las etapas.
+- [x] http://localhost:5000/health muestra `"version":"<número del build>"`.
 
 ---
 
@@ -214,3 +214,4 @@ Con todo marcado, actualizar CONTEXT.md (sección 8) y pasar a las Fases 3–6.
 | El worker de Spark no se registra | El master aún no estaba listo, o hay un conflicto de hostname | `docker compose logs spark-worker`; `docker compose restart spark-worker` |
 | Falla el build de la imagen de Spark al descargar jars | Sin internet, o versión inexistente en Maven | Revisar la conexión y los `ARG` de versión en `spark/Dockerfile` |
 | `kaggle ... 401 Unauthorized` | Token incorrecto o expirado | Generar un token nuevo en Kaggle y actualizar la credencial y el `.env` |
+

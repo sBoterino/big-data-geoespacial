@@ -1,8 +1,13 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v18 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v19 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v19:** se revocó el token de Kaggle expuesto y se creó `jenkins-bdgeo`; Jenkins
+> guarda `mongo-root` y `kaggle-api-token`. Se creó el job `bdgeo-main` contra `*/main` y el build
+> #1 terminó en SUCCESS: pytest, acceso real a Kaggle, Dask, Spark, staging y despliegue versión 1.
+> Falta conectar smee/GitHub y ejecutar la prueba negativa `FORZAR_FALLO` para cerrar el Gate 2.
 >
 > **Cambios en v18:** se corrigió la autenticación de Kaggle al mecanismo actual: paquete 2.2.4,
 > variable `KAGGLE_API_TOKEN` y credencial Jenkins `kaggle-api-token` de tipo *Secret text*. El token
@@ -377,8 +382,16 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   Dask confirmó dos workers y 300 documentos semilla. Spark leyó los 300, produjo los conteos
   120/80/100 y escribió tres resultados en `spark_check`, verificados directamente en MongoDB.
   Jenkins 2.541.3 se construyó e inició en el puerto 8080; el asistente inicial y el usuario
-  administrador quedaron completados. Falta configurar credenciales/job/webhook y demostrar el
-  bloqueo del despliegue.
+  administrador quedaron completados.
+- **F2, primer pipeline completo:** se revocó el token de Kaggle que había aparecido en una
+  captura y se creó uno nuevo llamado `jenkins-bdgeo`. Jenkins guarda las credenciales globales
+  `mongo-root` y `kaggle-api-token` sin revelar sus valores. El job `bdgeo-main` usa el repositorio
+  público, rama `*/main`, `Jenkinsfile` y el trigger `GitHub hook trigger for GITScm polling`.
+  El build #1 sobre el commit `a185f2bf1441184c25ec874c5d8639779619a9e3` terminó en SUCCESS
+  en 1 min 52 s: 4 tests pasaron y 1 se omitió; Kaggle listó el CSV de 420.704.526 bytes; Dask
+  confirmó 2 workers, media 0,5000 y 300 documentos; Spark leyó 300 con grupos 120/80/100;
+  staging respondió `version=1-staging`; producción respondió `version=1`. Evidencia textual en
+  `docs/evidencias/jenkins_build_1_2026-10-04.md`; la captura de Jenkins se conservó en la sesión.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
 
@@ -386,9 +399,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
 - [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
-- [ ] **F2: seguir `docs/guia_fase2.md` y validar el Gate 2 ejecutándolo de verdad.**
+- [ ] **F2: conectar smee/GitHub y demostrar que `FORZAR_FALLO` bloquea el despliegue.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 escrita, sin validar.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 funcional
+por ejecución manual; faltan webhook y prueba negativa para cerrar el Gate 2.**
 
 ---
 
@@ -453,7 +467,7 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 # 12. CRITERIO DE PROYECTO TERMINADO
 
 - [ ] `docker compose up` levanta todo con un comando en un equipo limpio.
-- [ ] La descarga desde Kaggle es automática en el pipeline, con credencial de Jenkins y sin secretos en GitHub.
+- [x] El acceso a Kaggle es automático en el pipeline, con credencial de Jenkins y sin secretos en GitHub.
 - [ ] Dask limpia y carga por lotes; la limpieza está justificada con conteos.
 - [ ] MongoDB tiene GeoJSON válido `[lon, lat]` e índice 2dsphere.
 - [ ] Spark agrega vía el conector y guarda los resultados en colecciones nuevas.
@@ -494,10 +508,12 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
    Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
 3. Invitar a los otros dos integrantes en GitHub. No activar el ruleset de `main`; exigir ramas,
    pull request y una revisión como norma del equipo y conservar la evidencia de los PR.
-4. Crear el `.env` local, levantar los servicios y conservar la salida de `docker compose ps`.
-5. Seguir **`docs/guia_fase2.md` paso a paso** (pasos 0 a 8) desde una terminal con Docker.
-6. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
-7. Marcar el checklist del Gate 2 y guardar las evidencias en `docs/evidencias/`.
+4. Configurar smee.io y el webhook de GitHub siguiendo el paso 5 de `docs/guia_fase2.md`; verificar
+   que un push o merge a `main` inicia Jenkins sin pulsar el botón manualmente.
+5. Ejecutar el build parametrizado con `FORZAR_FALLO=true`, comprobar que queda rojo antes del
+   despliegue y que `/health` conserva `version=1`; guardar captura.
+6. Auditar que no haya secretos en el historial, completar el checklist y cerrar el Gate 2.
+7. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
 8. Con el Gate 2 aprobado, arrancar **en paralelo**:
    - F4: ingesta Dask. Requiere el JSON de la verificación del dataset.
    - F5: consultas y API sobre `eventos_semilla`.
@@ -513,3 +529,4 @@ Al cerrar cada fase o gate, actualizar:
 - la evidencia en `docs/evidencias/`;
 - la sección 14 (próxima acción);
 - el número de versión y la fecha del encabezado.
+
