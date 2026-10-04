@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v10 (2-oct-2026)
+## Contexto maestro transferible entre IAs — v11 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v11:** Git 2.56.0 quedó operativo y se clonó una copia local normal del repositorio
+> público. La verificación del equipo corrigió un dato anterior: Docker Desktop no está instalado
+> ni disponible en el `PATH`, por lo que el Gate 2 queda bloqueado hasta instalarlo.
 >
 > **Cambios en v10:** se decidió no activar un ruleset de protección porque no es un requisito
 > explícito de la rúbrica. El equipo mantiene el flujo obligatorio de ramas, PR y revisión.
@@ -284,9 +288,8 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 # 8. ESTADO ACTUAL
 
 ## Completado
-- Docker Desktop fue reportado como instalado y probado (`hello-world`) en el equipo del
-  proyecto. El entorno aislado de Codex no expone el comando `docker`, por lo que el Gate 2
-  todavía debe ejecutarse desde la terminal del equipo anfitrión.
+- La comprobación del 4-oct-2026 no encontró Docker Desktop en el `PATH`, en las rutas habituales
+  ni en el registro de programas instalados. Debe instalarse antes de ejecutar el Gate 2.
 - Requisitos analizados; arquitectura v2 definida; decisiones D1–D6 y D8–D12 documentadas.
 - Candidatos de dataset investigados (sección 7).
 - **F0 técnico:** dataset principal descargado y perfilado; cumple el mínimo con 1.972.121
@@ -314,6 +317,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   Kaggle ni cachés. Falta invitar colaboradores. El ruleset `proteger-main` se preparó pero no
   se guardó: el equipo decidió no activarlo porque no es un requisito explícito; ramas, PR y
   revisión siguen siendo obligatorios como práctica de trabajo.
+- **F1 local sincronizada:** copia normal clonada desde GitHub; `main` sigue a `origin/main` y
+  quedó limpia. Git 2.56.0 funciona. La clonación requirió el backend TLS OpenSSL porque el
+  almacén de credenciales de Windows no está disponible dentro del entorno aislado.
 - **Registro académico:** borrador con cifras reales y los tres integrantes creado en
   `docs/registro_dataset_docente.md`. Falta enviarlo al docente.
 - **F2, archivos escritos (sin ejecutar en Docker todavía):**
@@ -337,8 +343,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
-- [ ] F1: invitar colaboradores, sincronizar una copia local normal con el remoto y completar la
-  asignación de roles de la sección 10.
+- [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
+- [ ] Entorno: instalar Docker Desktop y confirmar `docker --version`, `docker compose version`
+  y `docker run hello-world`.
 - [ ] **F2: seguir `docs/guia_fase2.md` y validar el Gate 2 ejecutándolo de verdad.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 escrita, sin validar.**
@@ -447,8 +454,7 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
    Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
 3. Invitar a los otros dos integrantes en GitHub. No activar el ruleset de `main`; exigir ramas,
    pull request y una revisión como norma del equipo y conservar la evidencia de los PR.
-4. Sincronizar una copia local normal desde
-   `https://github.com/sBoterino/big-data-geoespacial.git` para que el equipo trabaje con Git.
+4. Instalar Docker Desktop y verificar `docker run hello-world`.
 5. Seguir **`docs/guia_fase2.md` paso a paso** (pasos 0 a 8) desde una terminal con Docker.
 6. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
 7. Marcar el checklist del Gate 2 y guardar las evidencias en `docs/evidencias/`.
