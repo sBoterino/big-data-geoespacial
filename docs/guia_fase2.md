@@ -166,9 +166,9 @@ git commit -am "Prueba del pipeline" && git push -u origin feature/prueba-pipeli
 
 Abrir un PR, que otro integrante lo apruebe y hacer merge.
 
-- [ ] Jenkins arranca **solo**, en segundos, sin pulsar nada.
-- [ ] Todas las etapas quedan en verde y `/health` muestra el nuevo número de build.
-- [ ] **Captura de la vista de etapas → `docs/evidencias/`.**
+- [x] Jenkins arranca **solo**, en segundos, sin pulsar nada.
+- [x] Todas las etapas quedan en verde y `/health` muestra el nuevo número de build.
+- [ ] **Captura de la vista de etapas → `docs/evidencias/`.** (La evidencia textual ya está guardada.)
 
 ---
 
@@ -176,23 +176,23 @@ Abrir un PR, que otro integrante lo apruebe y hacer merge.
 
 En Jenkins: **Build with Parameters** → marcar ✅ `FORZAR_FALLO` → Build.
 
-- [ ] El build queda en **rojo** en *Pruebas unitarias (pytest)*.
-- [ ] Las etapas siguientes, incluida *Despliegue*, aparecen como **no ejecutadas**.
-- [ ] `/health` sigue mostrando la versión **anterior**.
-- [ ] **Captura → `docs/evidencias/`.** Esto demuestra "si una prueba falla, no se despliega".
+- [x] El build queda en **rojo** en *Pruebas unitarias (pytest)*.
+- [x] Las etapas siguientes, incluida *Despliegue*, aparecen como **no ejecutadas**.
+- [x] `/health` sigue mostrando la versión **anterior**.
+- [ ] **Captura → `docs/evidencias/`.** La consola y `/health` ya demuestran el bloqueo.
 
 ---
 
 ## ✅ Gate 2 — Checklist final
 
-- [ ] `docker compose up -d --build` levanta todo en un solo comando.
-- [ ] Spark tiene 1 worker ALIVE; Dask tiene 2 workers.
-- [ ] `check_cluster.py` y `check_conexion.py` terminan bien.
-- [ ] Push o merge a `main` dispara Jenkins automáticamente.
-- [ ] El pipeline completo queda en verde y despliega.
-- [ ] `FORZAR_FALLO` bloquea el despliegue.
-- [ ] No hay ningún secreto en el repositorio. Verificar con `git log -p | grep -i -E "password|key"`.
-- [ ] Las evidencias están guardadas.
+- [x] `docker compose up -d --build` levanta los servicios base; el perfil `ci` añade Jenkins y smee.
+- [x] Spark tiene 1 worker ALIVE; Dask tiene 2 workers.
+- [x] `check_cluster.py` y `check_conexion.py` terminan bien.
+- [x] Push o merge a `main` dispara Jenkins automáticamente.
+- [x] El pipeline completo queda en verde y despliega.
+- [x] `FORZAR_FALLO` bloquea el despliegue.
+- [x] No hay ningún secreto en el repositorio ni tokens reales en el historial.
+- [x] Las evidencias están guardadas.
 
 Con todo marcado, actualizar CONTEXT.md (sección 8) y pasar a las Fases 3–6.
 

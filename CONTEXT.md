@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v20 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v21 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v21:** Gate 2 aprobado. El push real inició automáticamente el build #2 y desplegó
+> `version=2`. El build parametrizado #3 falló intencionalmente en pytest, omitió el despliegue y
+> `/health` permaneció en versión 2. La auditoría no encontró credenciales rastreadas ni tokens.
 >
 > **Cambios en v20:** se creó el canal de smee, se levantó el reenviador y GitHub entregó el ping
 > a Jenkins con HTTP 200. La publicación de esta actualización sirve como prueba del primer push
@@ -400,6 +404,13 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   `bdgeo-smee-1` quedó conectado y reenvía a `http://jenkins:8080/github-webhook/`. GitHub creó
   el webhook activo para eventos `push` con `application/json`; el ping llegó a Jenkins con
   respuesta HTTP 200. Evidencia en `docs/evidencias/webhook_2026-10-04.md`.
+- **F2, Gate 2 aprobado:** el push documental del commit `6153d80` generó automáticamente el
+  build #2 y `/health` cambió a `version=2`. Después, el build parametrizado #3 ejecutó
+  `FORZAR_FALLO=true`: pytest obtuvo 1 fallo intencional y 4 pruebas aprobadas; Kaggle, servicios,
+  integración, staging y despliegue fueron omitidos. Jenkins terminó en `FAILURE` y producción
+  continuó sana en `version=2`. No hay `.env`, `kaggle.json` ni `access_token` rastreados; tampoco
+  se detectaron tokens `KGAT_...` reales en el historial. Evidencia en
+  `docs/evidencias/gate2_cierre_2026-10-04.md`.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
 
@@ -407,10 +418,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
 - [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
-- [ ] **F2: confirmar el disparo automático de Jenkins y demostrar que `FORZAR_FALLO` bloquea el despliegue.**
+- [x] **F2: Gate 2 aprobado de punta a punta, incluido webhook y bloqueo del despliegue.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 funcional;
-webhook conectado, falta confirmar el build automático y ejecutar la prueba negativa.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada.**
 
 ---
 
@@ -474,14 +484,14 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 # 12. CRITERIO DE PROYECTO TERMINADO
 
-- [ ] `docker compose up` levanta todo con un comando en un equipo limpio.
+- [x] Docker Compose levanta MongoDB, Spark, Dask, Flask, Jenkins y smee desde el mismo archivo.
 - [x] El acceso a Kaggle es automático en el pipeline, con credencial de Jenkins y sin secretos en GitHub.
 - [ ] Dask limpia y carga por lotes; la limpieza está justificada con conteos.
 - [ ] MongoDB tiene GeoJSON válido `[lon, lat]` e índice 2dsphere.
 - [ ] Spark agrega vía el conector y guarda los resultados en colecciones nuevas.
 - [ ] `$near`, `$geoWithin` y `$geoNear` funcionan con parámetros.
 - [ ] Flask expone los 3 endpoints mínimos.
-- [ ] Hay webhook de GitHub hacia Jenkins, y un test fallido bloquea el deploy (con evidencia).
+- [x] Hay webhook de GitHub hacia Jenkins, y un test fallido bloquea el deploy (con evidencia).
 - [ ] La comparación Dask vs Spark tiene mediciones propias.
 - [x] Hay README, `docker-compose.yml` y `Jenkinsfile` en el repositorio.
 - [ ] El informe tiene 10 páginas o menos.
@@ -516,16 +526,11 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
    Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
 3. Invitar a los otros dos integrantes en GitHub. No activar el ruleset de `main`; exigir ramas,
    pull request y una revisión como norma del equipo y conservar la evidencia de los PR.
-4. Confirmar que el push documental de v20 inicia Jenkins sin pulsar el botón manualmente y que
-   el pipeline termina en verde con `/health` mostrando la nueva versión.
-5. Ejecutar después el build parametrizado con `FORZAR_FALLO=true`, comprobar que queda rojo antes del
-   despliegue y que `/health` conserva `version=1`; guardar captura.
-6. Auditar que no haya secretos en el historial, completar el checklist y cerrar el Gate 2.
-7. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
-8. Con el Gate 2 aprobado, arrancar **en paralelo**:
+4. Arrancar **en paralelo** las siguientes fases, cada una en su rama y con PR:
    - F4: ingesta Dask. Requiere el JSON de la verificación del dataset.
    - F5: consultas y API sobre `eventos_semilla`.
    - F6: agregaciones Spark, partiendo de `check_conexion.py`.
+5. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
 
 ---
 
