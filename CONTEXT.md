@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v13 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v14 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v14:** el Compose base se construyó y levantó correctamente: 61/61 pasos, siete
+> servicios iniciados y respuestas correctas de API, Dask y Spark desde el host. Evidencia parcial
+> en `docs/evidencias/gate2_arranque_2026-10-04.md`; faltan las pruebas internas y Jenkins.
 >
 > **Cambios en v13:** Docker Desktop quedó instalado y verificado desde la PowerShell normal:
 > Docker 29.8.1, Docker Compose 5.5.1 y `docker run --rm hello-world` exitoso. El siguiente paso
@@ -333,7 +337,7 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   almacén de credenciales de Windows no está disponible dentro del entorno aislado.
 - **Registro académico:** borrador con cifras reales y los tres integrantes creado en
   `docs/registro_dataset_docente.md`. Falta enviarlo al docente.
-- **F2, archivos escritos (sin ejecutar en Docker todavía):**
+- **F2, archivos base:**
   - `docker-compose.yml`: mongodb, spark-master, spark-worker, dask-scheduler, dask-worker-1,
     dask-worker-2, api; `dask-job` en el perfil `jobs`; `jenkins` y `smee` en el perfil `ci`.
   - Imágenes: `api/`, `mongo/`, `spark/` (apache/spark 3.5.3 con conector 10.4.0) e
@@ -349,6 +353,11 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
     simulacro y banco de preguntas.
   - Compose: Spark monta `kaggle_data` (benchmark sobre el mismo Parquet) y hay un
     `spark-worker-2` en el perfil `bench`.
+- **F2, arranque base verificado:** `docker compose config --quiet` y
+  `docker compose up -d --build` terminaron bien; BuildKit completó 61/61 pasos en 64,3 s.
+  MongoDB, Spark master, Spark worker, Dask scheduler, dos workers de Dask y la API iniciaron.
+  `/health` devolvió `mongo=ok` y `status=ok`; los paneles de Dask y Spark respondieron HTTP 200.
+  Falta ejecutar las pruebas internas de Dask/Spark y configurar Jenkins/webhook.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
 
