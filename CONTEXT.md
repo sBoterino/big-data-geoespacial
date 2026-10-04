@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v12 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v13 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v13:** Docker Desktop quedó instalado y verificado desde la PowerShell normal:
+> Docker 29.8.1, Docker Compose 5.5.1 y `docker run --rm hello-world` exitoso. El siguiente paso
+> es crear el `.env` local y levantar los servicios del Gate 2.
 >
 > **Cambios en v12:** WSL 3.0.1 quedó instalado después del reinicio. Se descargó el instalador
 > oficial de Docker Desktop para Windows x86-64 y se verificó su firma válida de Docker Inc.; la
@@ -293,9 +297,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 # 8. ESTADO ACTUAL
 
 ## Completado
-- WSL 3.0.1 está instalado. Docker Desktop todavía no aparece en el `PATH`, en las rutas habituales
-  ni en el registro de programas instalados. Su instalador oficial (627.791.792 bytes) quedó
-  descargado y con firma válida de Docker Inc.; debe ejecutarse manualmente antes del Gate 2.
+- WSL 3.0.1 y Docker Desktop están instalados. Verificación desde la PowerShell normal:
+  Docker 29.8.1, Docker Compose 5.5.1 y `docker run --rm hello-world` exitoso. El entorno aislado
+  de Codex no puede ejecutar el CLI ubicado en `AppData` por una política de Windows, así que los
+  comandos reales de Docker deben ejecutarse en la terminal normal del usuario.
 - Requisitos analizados; arquitectura v2 definida; decisiones D1–D6 y D8–D12 documentadas.
 - Candidatos de dataset investigados (sección 7).
 - **F0 técnico:** dataset principal descargado y perfilado; cumple el mínimo con 1.972.121
@@ -350,8 +355,7 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
-- [ ] Entorno: instalar Docker Desktop y confirmar `docker --version`, `docker compose version`
-  y `docker run hello-world`.
+- [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
 - [ ] **F2: seguir `docs/guia_fase2.md` y validar el Gate 2 ejecutándolo de verdad.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 escrita, sin validar.**
@@ -460,7 +464,7 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
    Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
 3. Invitar a los otros dos integrantes en GitHub. No activar el ruleset de `main`; exigir ramas,
    pull request y una revisión como norma del equipo y conservar la evidencia de los PR.
-4. Instalar Docker Desktop y verificar `docker run hello-world`.
+4. Crear el `.env` local, levantar los servicios y conservar la salida de `docker compose ps`.
 5. Seguir **`docs/guia_fase2.md` paso a paso** (pasos 0 a 8) desde una terminal con Docker.
 6. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
 7. Marcar el checklist del Gate 2 y guardar las evidencias en `docs/evidencias/`.
