@@ -51,5 +51,7 @@ MongoDB Spark Connector.
 
 ## Pendiente para cerrar el Gate 2
 
-- Levantar Jenkins y configurar sus credenciales.
+- Jenkins se construyó correctamente en 242,7 segundos y el contenedor quedó iniciado en el
+  puerto 8080. La interfaz respondió como Jenkins 2.541.3 y redirigió a la autenticación.
+- Completar el asistente inicial de Jenkins y configurar sus credenciales.
 - Configurar el webhook, demostrar el despliegue correcto y el bloqueo con `FORZAR_FALLO`.

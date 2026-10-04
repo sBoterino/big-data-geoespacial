@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v15 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v16 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v16:** Jenkins se construyó en 242,7 s después de reiniciar Docker para recuperar
+> su DNS interno. El contenedor quedó iniciado en el puerto 8080 y Jenkins 2.541.3 respondió con
+> redirección a la pantalla de acceso. Falta completar el asistente, credenciales, job y webhook.
 >
 > **Cambios en v15:** las pruebas internas pasaron. Dask confirmó dos workers, cálculo distribuido
 > y 300 documentos semilla. Spark leyó los 300, agregó 120/80/100 y escribió tres documentos en
@@ -364,7 +368,8 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   `/health` devolvió `mongo=ok` y `status=ok`; los paneles de Dask y Spark respondieron HTTP 200.
   Dask confirmó dos workers y 300 documentos semilla. Spark leyó los 300, produjo los conteos
   120/80/100 y escribió tres resultados en `spark_check`, verificados directamente en MongoDB.
-  Falta configurar Jenkins/webhook y demostrar el bloqueo del despliegue.
+  Jenkins 2.541.3 se construyó e inició en el puerto 8080. Falta completar su asistente,
+  configurar credenciales/job/webhook y demostrar el bloqueo del despliegue.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
 
