@@ -83,13 +83,13 @@ docker compose exec jenkins docker ps
 ## Paso 3 — Credenciales en Jenkins
 
 Ir a **Manage Jenkins → Credentials → System → Global credentials → Add Credentials**.
-Todas son del tipo **Username with password**:
+Crear estas credenciales globales:
 
-| ID (exacto) | Username | Password |
+| ID (exacto) | Tipo | Valor |
 |---|---|---|
-| `mongo-root` | el mismo `MONGO_ROOT_USER` del `.env` | el mismo `MONGO_ROOT_PASSWORD` del `.env` |
-| `kaggle-credentials` | usuario de Kaggle | la API key de Kaggle |
-| `github-token` *(solo si el repo es privado)* | usuario de GitHub | un fine-grained token con permiso *Contents: Read* sobre el repo |
+| `mongo-root` | *Username with password* | el mismo `MONGO_ROOT_USER` y `MONGO_ROOT_PASSWORD` del `.env` |
+| `kaggle-api-token` | *Secret text* | token `KGAT_...` generado en Kaggle |
+| `github-token` *(solo si el repo es privado)* | *Username with password* | usuario y fine-grained token con permiso *Contents: Read* |
 
 - [ ] Las credenciales están creadas con esos IDs exactos. El Jenkinsfile los busca por nombre.
 

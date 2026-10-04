@@ -153,8 +153,7 @@ services:
     environment:
       <<: *mongo-env
       DASK_SCHEDULER: tcp://dask-scheduler:8786
-      KAGGLE_USERNAME: ${KAGGLE_USERNAME:-}
-      KAGGLE_KEY: ${KAGGLE_KEY:-}
+      KAGGLE_API_TOKEN: ${KAGGLE_API_TOKEN:-}
       KAGGLE_DATASET: ${KAGGLE_DATASET:-muzammilrizvi1/motor-vehicle-collisions-crashes}
       INGEST_MAX_ROWS: ${INGEST_MAX_ROWS:-0}
       INGEST_BATCH_SIZE: ${INGEST_BATCH_SIZE:-5000}

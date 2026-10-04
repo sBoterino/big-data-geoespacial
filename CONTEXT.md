@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v17 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v18 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v18:** se corrigió la autenticación de Kaggle al mecanismo actual: paquete 2.2.4,
+> variable `KAGGLE_API_TOKEN` y credencial Jenkins `kaggle-api-token` de tipo *Secret text*. El token
+> anterior debe revocarse porque apareció visible en una captura; el nuevo nunca se comparte.
 >
 > **Cambios en v17:** se completó el asistente inicial de Jenkins, se creó el usuario administrador
 > y el panel quedó accesible en `http://localhost:8080/`. Faltan las credenciales internas, el job,

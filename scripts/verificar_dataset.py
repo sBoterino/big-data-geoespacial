@@ -9,7 +9,7 @@ Comprueba, con mediciones reales y no con lo que dice la página de Kaggle:
      Estos números sirven después para justificar la limpieza en el informe.
 
 Requisitos:  pip install kaggle pandas
-Credenciales: variables KAGGLE_USERNAME y KAGGLE_KEY (o ~/.kaggle/kaggle.json).
+Credenciales: variable KAGGLE_API_TOKEN (o ~/.kaggle/access_token).
               Nunca escribirlas en este archivo.
 
 Uso:

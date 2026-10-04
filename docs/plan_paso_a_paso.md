@@ -331,7 +331,7 @@ Un DataFrame pequeño con exactamente un caso de cada regla más filas válidas.
 - Agregar la etapa "Ingesta (idempotente)" después de "Levantar servicios":
 
 ```
-withCredentials(kaggle-credentials) →
+withCredentials(kaggle-api-token) →
   . jenkins/ci-env.sh && FORCE_RELOAD=${FORCE_RELOAD} docker compose run --rm dask-job python pipeline_ingesta.py
 ```
 

@@ -6,7 +6,7 @@
 //
 // Credenciales requeridas en Jenkins (ver docs/guia_fase2.md):
 //   mongo-root          (Username with password)  usuario/contraseña root de MongoDB
-//   kaggle-credentials  (Username with password)  usuario de Kaggle / API key
+//   kaggle-api-token    (Secret text)             token KGAT_... de Kaggle
 
 pipeline {
     agent any
@@ -66,10 +66,10 @@ pipeline {
         stage('Verificar acceso a Kaggle') {
             when { expression { params.VERIFICAR_KAGGLE } }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'kaggle-credentials',
-                        usernameVariable: 'KAGGLE_USERNAME', passwordVariable: 'KAGGLE_KEY')]) {
+                withCredentials([string(credentialsId: 'kaggle-api-token',
+                        variable: 'KAGGLE_API_TOKEN')]) {
                     // -e VAR sin valor: Docker toma el valor del entorno sin mostrarlo en el log
-                    sh 'docker run --rm -e KAGGLE_USERNAME -e KAGGLE_KEY bdgeo-dask:latest kaggle datasets files "${KAGGLE_DATASET}"'
+                    sh 'docker run --rm -e KAGGLE_API_TOKEN bdgeo-dask:latest kaggle datasets files "${KAGGLE_DATASET}"'
                 }
             }
         }

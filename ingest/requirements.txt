@@ -4,4 +4,4 @@ bokeh==3.6.2
 pandas==2.2.3
 pyarrow==18.1.0
 pymongo==4.10.1
-kaggle==1.6.17
+kaggle==2.2.4
