@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v23 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v24 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v24:** el build de muestra #1 validó Kaggle, imágenes, pruebas y dos workers. Falló
+> de forma segura al deserializar el grafo porque el scheduler no encontraba `limpieza.py`.
+> Se añadió `Client.upload_file`; falta confirmar la corrección en el build #2.
 >
 > **Cambios en v23:** F4 implementada en `feature/ingesta-dask`: descarga cacheada de Kaggle,
 > limpieza R1–R6, GeoJSON, carga Dask por lotes, Parquet, metadatos idempotentes y etapa Jenkins.
@@ -430,6 +434,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   `INGEST_MAX_ROWS=0` para la carga completa. `docker compose config --quiet` pasó; la imagen de
   pruebas se construyó y obtuvo 3 pruebas aprobadas en 0,29 s. Falta muestra real, idempotencia y
   carga completa.
+- **F4, muestra #1:** Kaggle confirmó el CSV de 420.704.526 bytes, API obtuvo 4 pruebas aprobadas,
+  ingesta obtuvo 3 y Dask conectó 2 workers. La deserialización falló porque el scheduler no podía
+  importar `limpieza.py`; el pipeline bloqueó las etapas posteriores. Se corrigió distribuyendo el
+  módulo con `Client.upload_file`. Corrección pendiente de validar en el build #2.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.

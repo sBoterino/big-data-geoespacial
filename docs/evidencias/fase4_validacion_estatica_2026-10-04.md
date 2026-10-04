@@ -25,6 +25,17 @@ Rama: `feature/ingesta-dask`
 - Corrección: ejecutar `python -m pytest` dentro de la imagen.
 - Segunda ejecución: `3 passed in 0.29s`.
 
+## Primera muestra real — build `bdgeo-ingesta-test` #1
+
+- La credencial protegida funcionó y Kaggle confirmó el CSV de 420.704.526 bytes.
+- API: 4 pruebas aprobadas y 1 prueba intencional omitida.
+- Ingesta: 3 pruebas aprobadas en 0,77 s.
+- Dask confirmó dos workers y descargó el CSV en el volumen persistente.
+- El grafo falló antes de modificar la colección: el scheduler no podía importar `limpieza.py`.
+- Jenkins omitió integración, staging y despliegue; producción quedó intacta.
+- Corrección aplicada: `Client.upload_file` distribuye `limpieza.py` al scheduler y los workers
+  antes de enviar el grafo. Falta validarla en el build #2.
+
 ## Pendiente
 
 - Ejecutar una muestra real de 50.000 filas mediante la credencial protegida de Jenkins.

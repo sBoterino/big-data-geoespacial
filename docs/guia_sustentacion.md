@@ -34,6 +34,7 @@ seguir el despliegue y explicar por qué está construido así.
 | Reglas de limpieza R1–R6 | **Implementadas; datos reales pendientes** | `ingest/limpieza.py`, 3 tests Docker | Cada descarte se aplica en orden y queda contado de forma exclusiva; falta el reporte completo |
 | Ingesta idempotente | **Implementada; ejecución pendiente** | `ingest/pipeline_ingesta.py` | `ingesta_meta` y el conteo de Mongo deciden si se omite; `FORCE_RELOAD` permite recargar |
 | Validación de ramas sin afectar producción | **Implementada; ejecución pendiente** | Condiciones por `JOB_NAME` en `Jenkinsfile` | Solo `bdgeo-main` puede pasar por staging y despliegue; los jobs temporales usan etiquetas `validation-*` |
+| Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
 | Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
 | GeoJSON e índice 2dsphere | **Listo con datos semilla** | `mongo/init/01-init.js`, `02-semilla.js` | Validador, orden `[longitud, latitud]`, índices y resultados conocidos |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |
@@ -94,6 +95,13 @@ Los conteos reales se añadirán después de la carga completa.
 `ingesta_meta` guarda dataset, tamaño de muestra, estado y total final. Si el registro está
 completo y el conteo de `eventos` coincide, la ejecución imprime `Ingesta omitida`. Solo se
 recarga cuando cambia la configuración o `FORCE_RELOAD=true`.
+
+### ¿Por qué se usa `Client.upload_file` si todos usan la misma imagen?
+
+Tener la misma imagen garantiza versiones iguales, pero un proceso iniciado mediante el comando
+`dask scheduler` puede no incluir `/opt/ingest` en su ruta de importación. El primer build real lo
+detectó al deserializar el grafo. `upload_file` instala el módulo en la ruta temporal importable del
+scheduler y de los workers antes de enviar tareas.
 
 ### ¿Por qué GeoJSON usa `[longitud, latitud]`?
 

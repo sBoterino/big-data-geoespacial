@@ -120,6 +120,9 @@ def ejecutar() -> None:
         csv = descargar_dataset(dataset)
         cliente_dask = Client(os.getenv("DASK_SCHEDULER", "tcp://dask-scheduler:8786"))
         cliente_dask.wait_for_workers(2, timeout=120)
+        # Los comandos `dask scheduler` y `dask worker` no garantizan que /opt/ingest
+        # quede en sys.path. Dask debe poder importar este módulo al deserializar el grafo.
+        cliente_dask.upload_file(str(Path(__file__).with_name("limpieza.py")))
         print(f"[ingesta] workers conectados: {len(cliente_dask.scheduler_info()['workers'])}")
 
         raw = dd.read_csv(
