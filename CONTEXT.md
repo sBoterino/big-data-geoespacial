@@ -1,8 +1,13 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v14 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v15 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v15:** las pruebas internas pasaron. Dask confirmó dos workers, cálculo distribuido
+> y 300 documentos semilla. Spark leyó los 300, agregó 120/80/100 y escribió tres documentos en
+> `spark_check`, verificados directamente en MongoDB. La infraestructura distribuida está validada;
+> falta Jenkins, webhook y la demostración de bloqueo del despliegue.
 >
 > **Cambios en v14:** el Compose base se construyó y levantó correctamente: 61/61 pasos, siete
 > servicios iniciados y respuestas correctas de API, Dask y Spark desde el host. Evidencia parcial
@@ -357,7 +362,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   `docker compose up -d --build` terminaron bien; BuildKit completó 61/61 pasos en 64,3 s.
   MongoDB, Spark master, Spark worker, Dask scheduler, dos workers de Dask y la API iniciaron.
   `/health` devolvió `mongo=ok` y `status=ok`; los paneles de Dask y Spark respondieron HTTP 200.
-  Falta ejecutar las pruebas internas de Dask/Spark y configurar Jenkins/webhook.
+  Dask confirmó dos workers y 300 documentos semilla. Spark leyó los 300, produjo los conteos
+  120/80/100 y escribió tres resultados en `spark_check`, verificados directamente en MongoDB.
+  Falta configurar Jenkins/webhook y demostrar el bloqueo del despliegue.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
 

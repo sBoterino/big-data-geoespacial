@@ -24,10 +24,32 @@ Fecha: 4 de octubre de 2026
 - `http://localhost:8787/status`: HTTP 200.
 - `http://localhost:8081`: HTTP 200.
 
+## Integración Dask y MongoDB
+
+`docker compose run --rm dask-job python check_cluster.py` terminó correctamente:
+
+- dos workers conectados;
+- cálculo distribuido con media 0,5001 (esperada aproximadamente 0,5);
+- conexión a MongoDB correcta;
+- 300 documentos en `eventos_semilla`;
+- resultado final `OK`.
+
+## Integración Spark y MongoDB
+
+`spark-submit /opt/jobs/check_conexion.py` se conectó al clúster Spark 3.5.3, recibió un executor
+de dos núcleos y leyó los 300 documentos esperados. La agregación produjo:
+
+| Grupo | Conteo |
+|---|---:|
+| `A_times_square` | 120 |
+| `B_brooklyn_bridge` | 80 |
+| `C_queens` | 100 |
+
+Después de la ejecución se verificó directamente en MongoDB que `spark_check` contiene los tres
+documentos con esos mismos grupos y conteos. Esto confirma lectura y escritura mediante el
+MongoDB Spark Connector.
+
 ## Pendiente para cerrar el Gate 2
 
-- Ejecutar `ingest/check_cluster.py` y comprobar dos workers de Dask.
-- Ejecutar `spark/jobs/check_conexion.py` y comprobar lectura y escritura en MongoDB.
 - Levantar Jenkins y configurar sus credenciales.
 - Configurar el webhook, demostrar el despliegue correcto y el bloqueo con `FORZAR_FALLO`.
-
