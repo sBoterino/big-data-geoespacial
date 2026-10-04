@@ -8,7 +8,7 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
 > Estado: **Fase 2 — esqueleto de infraestructura y CI/CD** (pendiente de validar el Gate 2).
-> Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md).
+> Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset
 

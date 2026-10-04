@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v21 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v22 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v22:** se creó `docs/guia_sustentacion.md`, que cruza la sección 6 del enunciado
+> con las evidencias actuales, separa lo demostrable de lo pendiente y mantiene un banco vivo de
+> respuestas, cambios probables y evidencias. Debe actualizarse junto con este contexto.
 >
 > **Cambios en v21:** Gate 2 aprobado. El push real inició automáticamente el build #2 y desplegó
 > `version=2`. El build parametrizado #3 falló intencionalmente en pytest, omitió el despliegue y
@@ -513,6 +517,8 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 9. Explicar cada paso antes de ejecutarlo cuando el usuario trabaja de forma interactiva.
 10. Si una decisión cambia la arquitectura, detenerse, validarla y registrarla en `docs/decisiones.md`.
 11. La meta es un sistema reproducible y demostrable en vivo, no que funcione en un solo portátil.
+12. Actualizar `docs/guia_sustentacion.md` con cada función, decisión, evidencia o pregunta nueva
+    que pueda aparecer en la sustentación.
 
 ---
 
@@ -540,5 +546,6 @@ Al cerrar cada fase o gate, actualizar:
 - la sección 8 (estado);
 - la sección 3 (y `docs/decisiones.md` si hay decisiones nuevas);
 - la evidencia en `docs/evidencias/`;
+- `docs/guia_sustentacion.md` cuando exista contenido demostrable o una pregunta nueva;
 - la sección 14 (próxima acción);
 - el número de versión y la fecha del encabezado.
