@@ -1,12 +1,16 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v29 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v30 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
 >
+> **Cambios en v30:** PR #1 fusionado y `bdgeo-main` #6 aprobado. Dask procesó 1.972.121 filas en
+> 6 particiones, insertó 1.741.828 documentos en 57,435 s, pasó integraciones y desplegó API v6.
+> MongoDB e índices fueron auditados; falta una segunda ejecución idempotente de la carga completa.
+>
 > **Cambios en v29:** auditoría directa de la muestra aprobada: 45.843 documentos, un `Point` real
 > en orden longitud/latitud, fecha BSON y los índices `_id_`, `fecha_1` y `location_2dsphere`.
-> La rama está lista para PR; la carga completa aún no debe iniciarse.
+> La rama quedó integrada mediante PR #1; la carga completa fue aprobada en `bdgeo-main` #6.
 >
 > **Cambios en v28:** build #7 aprobado. La capa cacheable de Spark funcionó y la segunda ingesta
 > detectó los 45.843 documentos existentes, imprimió `Ingesta omitida`, pasó Dask/Spark y no
@@ -474,6 +478,12 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   staging/despliegue se omitieron y producción quedó intacta.
 - **F4, auditoría MongoDB aprobada:** conteo 45.843; documento `_id=4456314` con GeoJSON
   `Point [-73.8665, 40.667202]` y fecha BSON; índices `_id_`, `fecha_1` y `location_2dsphere`.
+- **F4, carga completa aprobada:** PR #1 fusionado; `bdgeo-main` #6 procesó 1.972.121 filas en
+  6 particiones, descartó 230.293 mediante R1–R4 e insertó 1.741.828 documentos en 57,435 s.
+  Dask/Spark, staging y smoke tests pasaron; API v6 fue desplegada.
+- **F4, auditoría completa aprobada:** MongoDB contiene 1.741.828 documentos; muestra real
+  `_id=4486564`, `Point [-74.00231, 40.59662]`, fecha BSON e índices `_id_`, `fecha_1` y
+  `location_2dsphere`. Reporte persistido en `docs/evidencias/`.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
@@ -483,9 +493,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F4: muestra de 50.000 filas aprobada.**
 - [x] **F4: idempotencia demostrada en el build #7.**
 - [x] **F4: GeoJSON e índices verificados directamente en la muestra.**
-- [ ] **F4: revisar/fusionar el PR y cargar el dataset completo.**
+- [x] **F4: PR #1 fusionado y carga completa aprobada.**
+- [ ] **F4: confirmar idempotencia sobre los 1.741.828 documentos y cerrar Gate 4.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 muestra aprobada.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 carga completa aprobada, falta cierre idempotente.**
 
 ---
 

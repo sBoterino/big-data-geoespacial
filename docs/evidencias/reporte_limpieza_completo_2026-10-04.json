@@ -1,0 +1,19 @@
+{
+  "dataset": "muzammilrizvi1/motor-vehicle-collisions-crashes",
+  "archivo": "/data/raw/muzammilrizvi1__motor-vehicle-collisions-crashes/Motor_Vehicle_Collisions_-_Crashes.csv",
+  "max_rows": 0,
+  "particiones": 6,
+  "reporte": {
+    "total_inicial": 1972121,
+    "R1_coord_nulas_no_numericas": 226028,
+    "R2_coord_cero": 4115,
+    "R3_fuera_rango": 106,
+    "R4_fuera_nyc": 44,
+    "R5_fecha_hora": 0,
+    "R6_duplicado": 0,
+    "total_final": 1741828
+  },
+  "insertados": 1741828,
+  "duracion_segundos": 57.435,
+  "fecha_utc": "2026-10-05T00:26:25.959971+00:00"
+}
