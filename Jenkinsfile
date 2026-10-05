@@ -107,6 +107,9 @@ pipeline {
         }
 
         stage('Ingesta (idempotente)') {
+            // Los jobs de rama nunca escriben en la colección real. La ingesta completa e
+            // idempotente pertenece exclusivamente al job de producción.
+            when { expression { env.JOB_NAME == 'bdgeo-main' } }
             steps {
                 withCredentials([string(credentialsId: 'kaggle-api-token',
                         variable: 'KAGGLE_API_TOKEN')]) {

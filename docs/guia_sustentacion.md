@@ -34,6 +34,7 @@ seguir el despliegue y explicar por qué está construido así.
 | Reglas de limpieza R1–R6 | **Validadas con carga completa** | `gate4_carga_completa_2026-10-04.md` | R1=226.028, R2=4.115, R3=106, R4=44, R5=0, R6=0; quedaron 1.741.828 documentos |
 | Ingesta idempotente | **Validada con carga completa** | `bdgeo-main` #7 | Encontró 1.741.828 documentos y omitió descarga, limpieza y reinserción; `FORCE_RELOAD` permite recargar |
 | Validación de ramas sin afectar producción | **Demostrada** | `bdgeo-ingesta-test` #3 | Staging y despliegue se omitieron por condición; el job terminó correctamente sin modificar producción |
+| Aislamiento de datos en ramas | **Reforzado en F5** | Condición de la etapa `Ingesta (idempotente)` | Solo `bdgeo-main` puede ejecutar la ingesta; los jobs de rama no escriben en `eventos` |
 | Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
 | Compatibilidad entre particiones y reducciones | **Corregida y validada** | `bdgeo-ingesta-test` #3 | Cinco pruebas y la muestra real confirmaron el conteo explícito de longitudes por partición |
 | Tolerancia a fallos transitorios de descarga | **Mitigada y validada** | Builds #4/#6/#7, `Jenkinsfile`, `spark/Dockerfile` | Tres intentos con espera; el build #7 creó la capa cacheable de JAR y terminó correctamente |

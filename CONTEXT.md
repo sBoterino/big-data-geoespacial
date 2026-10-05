@@ -1,8 +1,13 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v35 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v36 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v36:** antes de validar el PR #3 se detectó que un job de rama con
+> `INGEST_MAX_ROWS=50000` podía reemplazar la colección completa. La etapa de ingesta quedó
+> restringida a `bdgeo-main`; las ramas ejecutan unitarias e integraciones sin escribir en
+> producción.
 >
 > **Cambios en v35:** consultas F5 validadas sobre los 1.741.828 documentos. Promedios calientes:
 > `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms. La variante `$geoNear`
