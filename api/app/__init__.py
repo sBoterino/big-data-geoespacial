@@ -7,6 +7,8 @@ y en producción se conecta con la URI del entorno.
 from flask import Flask, jsonify
 
 from . import config
+from .rutas import bp as consultas_bp
+from .validacion import ErrorValidacion
 
 
 def create_app(db=None):
@@ -19,6 +21,7 @@ def create_app(db=None):
         db = client[config.MONGO_DB]
 
     app.config["DB"] = db
+    app.register_blueprint(consultas_bp)
 
     @app.get("/health")
     def health():
@@ -38,5 +41,9 @@ def create_app(db=None):
     @app.errorhandler(404)
     def no_encontrado(_):
         return jsonify(error="Ruta no encontrada"), 404
+
+    @app.errorhandler(ErrorValidacion)
+    def entrada_invalida(error):
+        return jsonify(error=str(error)), 400
 
     return app
