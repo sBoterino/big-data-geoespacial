@@ -32,15 +32,18 @@ seguir el despliegue y explicar por qué está construido así.
 | Credenciales seguras | **Listo** | Jenkins y auditoría del historial | Mongo usa `mongo-root`; Kaggle usa `kaggle-api-token`; `.env` está ignorado y no hay tokens reales en Git |
 | Dask distribuido | **Validado con carga completa** | `bdgeo-main` #6 | Dos workers procesaron 1.972.121 filas en 6 particiones |
 | Reglas de limpieza R1–R6 | **Validadas con carga completa** | `gate4_carga_completa_2026-10-04.md` | R1=226.028, R2=4.115, R3=106, R4=44, R5=0, R6=0; quedaron 1.741.828 documentos |
-| Ingesta idempotente | **Demostrada** | `bdgeo-ingesta-test` #7 | Encontró 45.843 documentos y omitió descarga, limpieza y reinserción; `FORCE_RELOAD` permite recargar |
+| Ingesta idempotente | **Validada con carga completa** | `bdgeo-main` #7 | Encontró 1.741.828 documentos y omitió descarga, limpieza y reinserción; `FORCE_RELOAD` permite recargar |
 | Validación de ramas sin afectar producción | **Demostrada** | `bdgeo-ingesta-test` #3 | Staging y despliegue se omitieron por condición; el job terminó correctamente sin modificar producción |
+| Aislamiento de datos en ramas | **Reforzado en F5** | Condición de la etapa `Ingesta (idempotente)` | Solo `bdgeo-main` puede ejecutar la ingesta; los jobs de rama no escriben en `eventos` |
 | Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
 | Compatibilidad entre particiones y reducciones | **Corregida y validada** | `bdgeo-ingesta-test` #3 | Cinco pruebas y la muestra real confirmaron el conteo explícito de longitudes por partición |
 | Tolerancia a fallos transitorios de descarga | **Mitigada y validada** | Builds #4/#6/#7, `Jenkinsfile`, `spark/Dockerfile` | Tres intentos con espera; el build #7 creó la capa cacheable de JAR y terminó correctamente |
 | Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
 | GeoJSON e índice 2dsphere | **Validado con carga completa** | Auditoría posterior a `bdgeo-main` #6 | Documento real `Point [-74.00231, 40.59662]`; índices `_id_`, `fecha_1` y `location_2dsphere` |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |
-| Consulta con otro polígono | **Pendiente de F5** | — | `/within` debe aceptar el polígono como parámetro; cambiar el polígono no debe exigir cambiar código |
+| Consulta con otro polígono | **Validada con semilla y datos reales** | `fase5_semilla_2026-10-04.md`, `fase5_datos_reales_2026-10-04.md` | `/within` recibe cualquier `Polygon` GeoJSON válido; cambiar el polígono no exige cambiar código |
+| Pruebas de consultas API | **Unitarias e integración real aprobadas** | Evidencias F5 en `docs/evidencias/` | 22 pruebas, conteos semilla 120/120/120 y consultas sobre 1.741.828 documentos; falta Jenkins |
+| Rendimiento de consultas | **Medido** | `fase5_datos_reales_2026-10-04.md` | Promedios calientes: `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms; agrupado 1.786,176 ms |
 | Dominio integral de los tres miembros | **Pendiente de ensayo** | — | Cada integrante debe practicar preguntas y hacer cambios fuera de su componente principal |
 
 ## 3. Demostración que ya podemos hacer

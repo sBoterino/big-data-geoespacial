@@ -2,9 +2,9 @@
 
 Fecha de ejecución: 4-oct-2026 (UTC del reporte: 5-oct-2026)
 
-Build: `bdgeo-main` #6
-Commit: merge del PR #1
-Resultado: `SUCCESS`
+Build de carga: `bdgeo-main` #6 (merge del PR #1)
+Build de verificación idempotente: `bdgeo-main` #7 (commit `269ac38f89c5d1918408fb7279fbdce0304a0837`, merge del PR #2)
+Resultado de ambos: `SUCCESS`
 
 ## Resultado de la ingesta
 
@@ -48,5 +48,13 @@ El reporte original generado por el pipeline se conserva en
 ## Gate
 
 La carga completa, la limpieza justificada, el almacenamiento MongoDB, GeoJSON, los índices y las
-integraciones están aprobados. La siguiente ejecución de `bdgeo-main` debe omitir la carga y dejar
-evidencia de idempotencia sobre los 1.741.828 documentos antes de dar el Gate 4 por cerrado.
+integraciones están aprobados. En la ejecución posterior, `bdgeo-main` #7 encontró los 1.741.828
+documentos asociados a `muzammilrizvi1/motor-vehicle-collisions-crashes|max_rows=0` y mostró:
+
+```text
+[ingesta] Ingesta omitida: 1,741,828 documentos ya corresponden a muzammilrizvi1/motor-vehicle-collisions-crashes|max_rows=0.
+```
+
+Después pasaron la comprobación de dos workers Dask, la integración Spark–MongoDB, staging y los
+smoke tests; se desplegó la API versión 7 y Jenkins terminó `SUCCESS`. No hubo descarga, limpieza
+ni reinserción. **Gate 4 cerrado.**

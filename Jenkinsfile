@@ -107,6 +107,9 @@ pipeline {
         }
 
         stage('Ingesta (idempotente)') {
+            // Los jobs de rama nunca escriben en la colección real. La ingesta completa e
+            // idempotente pertenece exclusivamente al job de producción.
+            when { expression { env.JOB_NAME == 'bdgeo-main' } }
             steps {
                 withCredentials([string(credentialsId: 'kaggle-api-token',
                         variable: 'KAGGLE_API_TOKEN')]) {
@@ -136,11 +139,12 @@ pipeline {
             steps {
                 sh '''
                     . jenkins/ci-env.sh
-                    docker run -d --name ${STAGING} --network bdgeo-net \
-                        -e MONGO_ROOT_USER -e MONGO_ROOT_PASSWORD \
-                        -e MONGO_HOST=mongodb -e MONGO_DB=geo -e APP_VERSION=${API_TAG}-staging \
-                        bdgeo-api:${API_TAG}
-                    bash scripts/smoke_api.sh http://${STAGING}:5000
+                     docker run -d --name ${STAGING} --network bdgeo-net \
+                          -e MONGO_ROOT_USER -e MONGO_ROOT_PASSWORD \
+                         -e MONGO_HOST=mongodb -e MONGO_DB=geo \
+                         -e MONGO_COLLECTION=eventos_semilla -e APP_VERSION=${API_TAG}-staging \
+                          bdgeo-api:${API_TAG}
+                     SMOKE_SEMILLA=true bash scripts/smoke_api.sh http://${STAGING}:5000
                 '''
             }
         }

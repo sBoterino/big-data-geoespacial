@@ -7,7 +7,7 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
-> Estado: **Gate 2 aprobado; Fase 4 — carga completa aprobada, cierre idempotente pendiente**.
+> Estado: **Gate 2 aprobado; Fase 4 y Gate 4 aprobados; siguiente foco: Fase 5 — API geoespacial**.
 > Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset
@@ -82,14 +82,19 @@ scripts/      Verificación del dataset, generador de semilla, smoke tests de la
 docs/         Decisiones, evidencias e informe
 ```
 
-## Endpoints *(solo `/health` implementado; el resto en la Fase 5)*
+## Endpoints
 
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/health` | Estado del servicio |
-| GET | `/near?lat=&lon=&radio=` | Registros dentro de un radio (`$near`) |
-| POST | `/within` | Registros dentro de un polígono GeoJSON (`$geoWithin`) |
-| GET | `/spark-results/<coleccion>` | Resultados calculados por Spark |
+| GET | `/near?lat=&lon=&radio=&limit=` | Registros dentro de un radio (`$near`) |
+| POST | `/within?limit=` | Registros dentro de un polígono GeoJSON (`$geoWithin`) |
+| GET | `/geonear?lat=&lon=&radio=&limit=&agrupar=` | Agregación geoespacial (`$geoNear`) |
+| GET | `/spark-results` | Colecciones permitidas generadas por Spark |
+| GET | `/spark-results/<nombre>` | Resultados calculados por Spark |
+
+Los endpoints de F5 están implementados y en validación. Todas las consultas aceptan parámetros,
+rechazan entradas inválidas con HTTP 400 y reportan `tiempo_ms`.
 
 ## Flujo de trabajo en Git
 

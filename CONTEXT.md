@@ -1,8 +1,35 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v30 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v36 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v36:** antes de validar el PR #3 se detectó que un job de rama con
+> `INGEST_MAX_ROWS=50000` podía reemplazar la colección completa. La etapa de ingesta quedó
+> restringida a `bdgeo-main`; las ramas ejecutan unitarias e integraciones sin escribir en
+> producción.
+>
+> **Cambios en v35:** consultas F5 validadas sobre los 1.741.828 documentos. Promedios calientes:
+> `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms. La variante `$geoNear`
+> agrupada promedió 1.786,176 ms porque procesa todo el radio. Falta PR/Jenkins para cerrar Gate 5.
+>
+> **Cambios en v34:** integración F5 contra `eventos_semilla` aprobada. `/near` devolvió 120 en
+> 12,408 ms, `/within` devolvió 120 en 3,093 ms y `/geonear` devolvió un grupo con n=120 en
+> 11,397 ms. Los conteos coinciden con la evidencia esperada; faltan datos reales y Jenkins.
+>
+> **Cambios en v33:** la imagen `bdgeo-api-test:f5` se construyó correctamente y ejecutó
+> 22 pruebas aprobadas en 0,05 s; la única omitida fue la prueba trampa, como corresponde.
+> Falta validar los endpoints contra `eventos_semilla` y los datos reales.
+>
+> **Cambios en v32:** F5 iniciada en `feature/api-consultas`. Se implementaron validación,
+> constructores puros y rutas `/near`, `/within`, `/geonear`, `/spark-results` y
+> `/spark-results/<nombre>`, serialización y medición de tiempos. Staging usa
+> `eventos_semilla` y los smoke tests comprueban 120/120/120. Falta ejecutar las pruebas en Docker
+> y validar contra MongoDB antes de aprobar Gate 5.
+>
+> **Cambios en v31:** PR #2 fusionado y `bdgeo-main` #7 aprobado. La segunda ejecución encontró
+> los 1.741.828 documentos de la carga completa, imprimió `Ingesta omitida`, pasó las integraciones
+> Dask/Spark, staging y smoke tests, y desplegó la API v7. Gate 4 queda cerrado.
 >
 > **Cambios en v30:** PR #1 fusionado y `bdgeo-main` #6 aprobado. Dask procesó 1.972.121 filas en
 > 6 particiones, insertó 1.741.828 documentos en 57,435 s, pasó integraciones y desplegó API v6.
@@ -484,6 +511,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - **F4, auditoría completa aprobada:** MongoDB contiene 1.741.828 documentos; muestra real
   `_id=4486564`, `Point [-74.00231, 40.59662]`, fecha BSON e índices `_id_`, `fecha_1` y
   `location_2dsphere`. Reporte persistido en `docs/evidencias/`.
+- **F4, idempotencia completa y Gate 4 cerrados:** PR #2 fusionado; `bdgeo-main` #7 encontró los
+  1.741.828 documentos asociados al dataset con `max_rows=0` y omitió descarga, limpieza y
+  reinserción. Dask/Spark, staging y smoke tests pasaron; API v7 fue desplegada y el build terminó
+  `SUCCESS`.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
@@ -494,9 +525,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F4: idempotencia demostrada en el build #7.**
 - [x] **F4: GeoJSON e índices verificados directamente en la muestra.**
 - [x] **F4: PR #1 fusionado y carga completa aprobada.**
-- [ ] **F4: confirmar idempotencia sobre los 1.741.828 documentos y cerrar Gate 4.**
+- [x] **F4: idempotencia confirmada sobre los 1.741.828 documentos; Gate 4 cerrado.**
+- [ ] **F5: unitarias, semilla 120/120/120 y datos reales aprobados; falta PR/Jenkins.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 carga completa aprobada, falta cierre idempotente.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 en validación.**
 
 ---
 
