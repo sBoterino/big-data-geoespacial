@@ -66,8 +66,6 @@ Rama: `feature/ingesta-dask`
 
 ## Pendiente
 
-- Ejecutar el build #4 y comprobar que la ingesta se omite por idempotencia.
-- Verificar directamente un documento GeoJSON y los índices de la colección.
 - Ejecutar la carga completa y conservar `reporte_limpieza.json`.
 
 ## Incidencia de red antes de la prueba idempotente
@@ -78,3 +76,27 @@ Rama: `feature/ingesta-dask`
 - Hallazgo estructural: los `ADD` remotos del Dockerfile de Spark consultaban Maven en cada build.
 - Mitigación: descarga de JAR en una capa `RUN` cacheable y hasta tres intentos con espera para los
   comandos de construcción. La primera construcción de esa capa todavía requiere internet.
+
+## Idempotencia — build `bdgeo-ingesta-test` #7
+
+- Resultado: `SUCCESS`, iniciado automáticamente por el webhook.
+- La nueva capa cacheable de Spark se construyó y la mitigación de red quedó validada.
+- API: 4 pruebas aprobadas y 1 intencionalmente omitida; ingesta: 5 aprobadas.
+- Mensaje: `Ingesta omitida: 45,843 documentos ya corresponden a ...|max_rows=50000`.
+- No se descargó, limpió, vació ni reinsertó la colección.
+- Integraciones Dask y Spark aprobadas.
+- Staging y despliegue omitidos por condición; producción no fue modificada.
+- La segunda ejecución demuestra la decisión D3 de ingesta idempotente.
+
+## Auditoría directa de MongoDB
+
+Consulta ejecutada con `mongosh` contra `geo.eventos` después del build #7:
+
+- Conteo: 45.843 documentos, igual al reporte y a `ingesta_meta`.
+- Documento observado: `_id='4456314'`.
+- GeoJSON: `type='Point'`, coordenadas `[-73.8665, 40.667202]` en orden longitud/latitud.
+- Fecha: `ISODate('2021-09-11T09:35:00.000Z')`.
+- Índices presentes: `_id_`, `fecha_1` y `location_2dsphere`.
+
+Esto confirma que la muestra no solo fue contada: quedó almacenada con el modelo e índices que
+usarán las consultas geoespaciales y temporales.

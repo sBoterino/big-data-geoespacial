@@ -32,13 +32,13 @@ seguir el despliegue y explicar por qué está construido así.
 | Credenciales seguras | **Listo** | Jenkins y auditoría del historial | Mongo usa `mongo-root`; Kaggle usa `kaggle-api-token`; `.env` está ignorado y no hay tokens reales en Git |
 | Dask distribuido básico | **Listo como infraestructura** | `ingest/check_cluster.py` | Scheduler, dos workers, cálculo distribuido y lectura de 300 documentos semilla |
 | Reglas de limpieza R1–R6 | **Validadas en muestra; carga completa pendiente** | `bdgeo-ingesta-test` #3, 5 tests Docker | De 50.000 filas: R1 descartó 3.888, R2 descartó 269 y quedaron 45.843 documentos |
-| Ingesta idempotente | **Implementada; ejecución pendiente** | `ingest/pipeline_ingesta.py` | `ingesta_meta` y el conteo de Mongo deciden si se omite; `FORCE_RELOAD` permite recargar |
+| Ingesta idempotente | **Demostrada** | `bdgeo-ingesta-test` #7 | Encontró 45.843 documentos y omitió descarga, limpieza y reinserción; `FORCE_RELOAD` permite recargar |
 | Validación de ramas sin afectar producción | **Demostrada** | `bdgeo-ingesta-test` #3 | Staging y despliegue se omitieron por condición; el job terminó correctamente sin modificar producción |
 | Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
 | Compatibilidad entre particiones y reducciones | **Corregida y validada** | `bdgeo-ingesta-test` #3 | Cinco pruebas y la muestra real confirmaron el conteo explícito de longitudes por partición |
-| Tolerancia a fallos transitorios de descarga | **Mitigada; validación pendiente** | Builds #4/#6, `Jenkinsfile`, `spark/Dockerfile` | Tres intentos con espera; los JAR quedan en una capa cacheable y no se consultan en cada build |
+| Tolerancia a fallos transitorios de descarga | **Mitigada y validada** | Builds #4/#6/#7, `Jenkinsfile`, `spark/Dockerfile` | Tres intentos con espera; el build #7 creó la capa cacheable de JAR y terminó correctamente |
 | Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
-| GeoJSON e índice 2dsphere | **Listo con datos semilla** | `mongo/init/01-init.js`, `02-semilla.js` | Validador, orden `[longitud, latitud]`, índices y resultados conocidos |
+| GeoJSON e índice 2dsphere | **Validado con datos reales** | Auditoría posterior al build #7 | Documento real `Point` con `[-73.8665, 40.667202]`; índices `_id_`, `fecha_1` y `location_2dsphere` |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |
 | Consulta con otro polígono | **Pendiente de F5** | — | `/within` debe aceptar el polígono como parámetro; cambiar el polígono no debe exigir cambiar código |
 | Dominio integral de los tres miembros | **Pendiente de ensayo** | — | Cada integrante debe practicar preguntas y hacer cambios fuera de su componente principal |
@@ -96,7 +96,8 @@ Los conteos reales se añadirán después de la carga completa.
 
 `ingesta_meta` guarda dataset, tamaño de muestra, estado y total final. Si el registro está
 completo y el conteo de `eventos` coincide, la ejecución imprime `Ingesta omitida`. Solo se
-recarga cuando cambia la configuración o `FORCE_RELOAD=true`.
+recarga cuando cambia la configuración o `FORCE_RELOAD=true`. El build #7 lo demostró al conservar
+45.843 documentos sin repetir la descarga ni la transformación.
 
 ### ¿Por qué se usa `Client.upload_file` si todos usan la misma imagen?
 

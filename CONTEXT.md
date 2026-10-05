@@ -1,8 +1,16 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v27 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v29 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v29:** auditoría directa de la muestra aprobada: 45.843 documentos, un `Point` real
+> en orden longitud/latitud, fecha BSON y los índices `_id_`, `fecha_1` y `location_2dsphere`.
+> La rama está lista para PR; la carga completa aún no debe iniciarse.
+>
+> **Cambios en v28:** build #7 aprobado. La capa cacheable de Spark funcionó y la segunda ingesta
+> detectó los 45.843 documentos existentes, imprimió `Ingesta omitida`, pasó Dask/Spark y no
+> modificó producción. D3 quedó demostrada.
 >
 > **Cambios en v27:** los builds #4 y #6 no llegaron a la idempotencia por DNS de Docker
 > Hub/Maven. Se sustituyeron los `ADD` remotos de Spark por una capa `RUN` cacheable y se añadieron
@@ -461,6 +469,11 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - **F4, idempotencia aplazada por red:** builds #4 y #6 fallaron antes de las pruebas por DNS de
   Docker Hub y Maven. No modificaron datos. Spark ahora guarda sus JAR en una capa `RUN` cacheable
   y Jenkins reintenta cada construcción hasta tres veces con espera incremental.
+- **F4, idempotencia aprobada:** build #7 terminó `SUCCESS`. Encontró 45.843 documentos para la
+  muestra de 50.000 y omitió descarga, limpieza y reinserción. Las integraciones Dask/Spark pasaron,
+  staging/despliegue se omitieron y producción quedó intacta.
+- **F4, auditoría MongoDB aprobada:** conteo 45.843; documento `_id=4456314` con GeoJSON
+  `Point [-73.8665, 40.667202]` y fecha BSON; índices `_id_`, `fecha_1` y `location_2dsphere`.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
@@ -468,7 +481,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
 - [x] **F2: Gate 2 aprobado de punta a punta, incluido webhook y bloqueo del despliegue.**
 - [x] **F4: muestra de 50.000 filas aprobada.**
-- [ ] **F4: demostrar idempotencia, verificar GeoJSON/índices y cargar el dataset completo.**
+- [x] **F4: idempotencia demostrada en el build #7.**
+- [x] **F4: GeoJSON e índices verificados directamente en la muestra.**
+- [ ] **F4: revisar/fusionar el PR y cargar el dataset completo.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 muestra aprobada.**
 
