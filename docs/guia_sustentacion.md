@@ -36,6 +36,7 @@ seguir el despliegue y explicar por qué está construido así.
 | Validación de ramas sin afectar producción | **Demostrada** | `bdgeo-ingesta-test` #3 | Staging y despliegue se omitieron por condición; el job terminó correctamente sin modificar producción |
 | Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
 | Compatibilidad entre particiones y reducciones | **Corregida y validada** | `bdgeo-ingesta-test` #3 | Cinco pruebas y la muestra real confirmaron el conteo explícito de longitudes por partición |
+| Tolerancia a fallos transitorios de descarga | **Mitigada; validación pendiente** | Builds #4/#6, `Jenkinsfile`, `spark/Dockerfile` | Tres intentos con espera; los JAR quedan en una capa cacheable y no se consultan en cada build |
 | Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
 | GeoJSON e índice 2dsphere | **Listo con datos semilla** | `mongo/init/01-init.js`, `02-semilla.js` | Validador, orden `[longitud, latitud]`, índices y resultados conocidos |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |

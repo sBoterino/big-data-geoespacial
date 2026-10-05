@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v26 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v27 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v27:** los builds #4 y #6 no llegaron a la idempotencia por DNS de Docker
+> Hub/Maven. Se sustituyeron los `ADD` remotos de Spark por una capa `RUN` cacheable y se añadieron
+> tres intentos con espera a las construcciones Jenkins. Falta validar la mitigación.
 >
 > **Cambios en v26:** build de muestra #3 aprobado. Procesó 50.000 filas, descartó 3.888 por R1 y
 > 269 por R2, insertó 45.843 documentos en 5,684 s, pasó Dask/Spark y omitió el despliegue por ser
@@ -454,6 +458,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   R2 descartó 269 y R3–R6 no descartaron filas; MongoDB recibió 45.843 documentos en 5,684 s.
   Dask confirmó 2 workers y Spark conservó los controles 120/80/100. Staging y despliegue se
   omitieron por condición y el build terminó `SUCCESS` sin modificar producción.
+- **F4, idempotencia aplazada por red:** builds #4 y #6 fallaron antes de las pruebas por DNS de
+  Docker Hub y Maven. No modificaron datos. Spark ahora guarda sus JAR en una capa `RUN` cacheable
+  y Jenkins reintenta cada construcción hasta tres veces con espera incremental.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.

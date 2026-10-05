@@ -57,9 +57,23 @@ pipeline {
             steps {
                 sh '''
                     . jenkins/ci-env.sh
-                    docker compose build
-                    docker build --target test -t bdgeo-api-test:${API_TAG} api
-                    docker build --target test -t bdgeo-ingest-test:${API_TAG} ingest
+                    reintentar() {
+                        intento=1
+                        hasta=3
+                        until "$@"; do
+                            if [ "$intento" -ge "$hasta" ]; then
+                                echo "El comando falló después de ${hasta} intentos."
+                                return 1
+                            fi
+                            espera=$((intento * 10))
+                            echo "Fallo transitorio; reintento $((intento + 1))/${hasta} en ${espera}s..."
+                            sleep "$espera"
+                            intento=$((intento + 1))
+                        done
+                    }
+                    reintentar docker compose build
+                    reintentar docker build --target test -t bdgeo-api-test:${API_TAG} api
+                    reintentar docker build --target test -t bdgeo-ingest-test:${API_TAG} ingest
                 '''
             }
         }

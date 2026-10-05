@@ -69,3 +69,12 @@ Rama: `feature/ingesta-dask`
 - Ejecutar el build #4 y comprobar que la ingesta se omite por idempotencia.
 - Verificar directamente un documento GeoJSON y los índices de la colección.
 - Ejecutar la carga completa y conservar `reporte_limpieza.json`.
+
+## Incidencia de red antes de la prueba idempotente
+
+- Los builds #4 y #6 no alcanzaron las pruebas ni la ingesta por fallos DNS de Docker Desktop.
+- #4 no resolvió `registry-1.docker.io`; #6 no resolvió `repo1.maven.org`.
+- No son fallos del pipeline de datos y no modificaron MongoDB ni producción.
+- Hallazgo estructural: los `ADD` remotos del Dockerfile de Spark consultaban Maven en cada build.
+- Mitigación: descarga de JAR en una capa `RUN` cacheable y hasta tres intentos con espera para los
+  comandos de construcción. La primera construcción de esa capa todavía requiere internet.
