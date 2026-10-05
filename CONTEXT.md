@@ -1,8 +1,36 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v22 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v29 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v29:** auditoría directa de la muestra aprobada: 45.843 documentos, un `Point` real
+> en orden longitud/latitud, fecha BSON y los índices `_id_`, `fecha_1` y `location_2dsphere`.
+> La rama está lista para PR; la carga completa aún no debe iniciarse.
+>
+> **Cambios en v28:** build #7 aprobado. La capa cacheable de Spark funcionó y la segunda ingesta
+> detectó los 45.843 documentos existentes, imprimió `Ingesta omitida`, pasó Dask/Spark y no
+> modificó producción. D3 quedó demostrada.
+>
+> **Cambios en v27:** los builds #4 y #6 no llegaron a la idempotencia por DNS de Docker
+> Hub/Maven. Se sustituyeron los `ADD` remotos de Spark por una capa `RUN` cacheable y se añadieron
+> tres intentos con espera a las construcciones Jenkins. Falta validar la mitigación.
+>
+> **Cambios en v26:** build de muestra #3 aprobado. Procesó 50.000 filas, descartó 3.888 por R1 y
+> 269 por R2, insertó 45.843 documentos en 5,684 s, pasó Dask/Spark y omitió el despliegue por ser
+> un job de rama. El próximo build debe demostrar idempotencia.
+>
+> **Cambios en v25:** el build #2 confirmó la distribución de `limpieza.py` y avanzó hasta el
+> conteo final. Detectó una reducción inestable de escalares con una sola partición. Se reemplazó
+> por suma explícita de longitudes y se añadieron dos pruebas; falta validarlo en el build #3.
+>
+> **Cambios en v24:** el build de muestra #1 validó Kaggle, imágenes, pruebas y dos workers. Falló
+> de forma segura al deserializar el grafo porque el scheduler no encontraba `limpieza.py`.
+> Se añadió `Client.upload_file`; falta confirmar la corrección en el build #2.
+>
+> **Cambios en v23:** F4 implementada en `feature/ingesta-dask`: descarga cacheada de Kaggle,
+> limpieza R1–R6, GeoJSON, carga Dask por lotes, Parquet, metadatos idempotentes y etapa Jenkins.
+> Las 3 pruebas sintéticas pasaron dentro de Docker; falta ejecutar la muestra de 50.000 filas.
 >
 > **Cambios en v22:** se creó `docs/guia_sustentacion.md`, que cruza la sección 6 del enunciado
 > con las evidencias actuales, separa lo demostrable de lo pendiente y mantiene un banco vivo de
@@ -417,14 +445,47 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
   `docs/evidencias/gate2_cierre_2026-10-04.md`.
 - **F3, avance:** `mongo/init/01-init.js` (validador GeoJSON e índices 2dsphere),
   `02-semilla.js` (300 puntos) y `semilla_esperados.json`.
+- **F4, implementación en rama:** `ingest/descarga.py` descarga con la API de Kaggle y valida su
+  caché; `limpieza.py` aplica R1–R6 en orden y construye GeoJSON; `pipeline_ingesta.py` coordina
+  dos workers, deduplica globalmente, carga MongoDB por lotes, recrea índices, exporta Parquet y
+  registra `ingesta_meta`. Jenkins construye y ejecuta la imagen de tests y añade la etapa
+  `Ingesta (idempotente)`. Solo el job `bdgeo-main` puede desplegar; un job de rama usa etiquetas
+  `validation-*`, procesa 50.000 filas y valida sin modificar producción; `bdgeo-main` conserva
+  `INGEST_MAX_ROWS=0` para la carga completa. `docker compose config --quiet` pasó; la imagen de
+  pruebas se construyó y obtuvo 3 pruebas aprobadas en 0,29 s. Falta muestra real, idempotencia y
+  carga completa.
+- **F4, muestra #1:** Kaggle confirmó el CSV de 420.704.526 bytes, API obtuvo 4 pruebas aprobadas,
+  ingesta obtuvo 3 y Dask conectó 2 workers. La deserialización falló porque el scheduler no podía
+  importar `limpieza.py`; el pipeline bloqueó las etapas posteriores. Se corrigió distribuyendo el
+  módulo con `Client.upload_file`, corrección confirmada en el build #2.
+- **F4, muestra #2:** `upload_file` funcionó y se reutilizó la caché. Falló antes de escribir en
+  MongoDB porque `map_partitions(len).sum()` intentó reducir un entero como serie al existir una
+  sola partición. Se creó `contar_filas`, que suma las longitudes materializadas, con pruebas para
+  una y varias particiones. Corrección confirmada en el build #3.
+- **F4, muestra #3 aprobada:** 5 pruebas de ingesta pasaron. De 50.000 filas, R1 descartó 3.888,
+  R2 descartó 269 y R3–R6 no descartaron filas; MongoDB recibió 45.843 documentos en 5,684 s.
+  Dask confirmó 2 workers y Spark conservó los controles 120/80/100. Staging y despliegue se
+  omitieron por condición y el build terminó `SUCCESS` sin modificar producción.
+- **F4, idempotencia aplazada por red:** builds #4 y #6 fallaron antes de las pruebas por DNS de
+  Docker Hub y Maven. No modificaron datos. Spark ahora guarda sus JAR en una capa `RUN` cacheable
+  y Jenkins reintenta cada construcción hasta tres veces con espera incremental.
+- **F4, idempotencia aprobada:** build #7 terminó `SUCCESS`. Encontró 45.843 documentos para la
+  muestra de 50.000 y omitió descarga, limpieza y reinserción. Las integraciones Dask/Spark pasaron,
+  staging/despliegue se omitieron y producción quedó intacta.
+- **F4, auditoría MongoDB aprobada:** conteo 45.843; documento `_id=4456314` con GeoJSON
+  `Point [-73.8665, 40.667202]` y fecha BSON; índices `_id_`, `fecha_1` y `location_2dsphere`.
 
 ## Pendiente
 - [ ] F0: enviar al docente el registro del dataset ya verificado.
 - [ ] F1: invitar colaboradores y completar la asignación de roles de la sección 10.
 - [x] Entorno: Docker Desktop, Docker Compose y `hello-world` verificados.
 - [x] **F2: Gate 2 aprobado de punta a punta, incluido webhook y bloqueo del despliegue.**
+- [x] **F4: muestra de 50.000 filas aprobada.**
+- [x] **F4: idempotencia demostrada en el build #7.**
+- [x] **F4: GeoJSON e índices verificados directamente en la muestra.**
+- [ ] **F4: revisar/fusionar el PR y cargar el dataset completo.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 muestra aprobada.**
 
 ---
 
