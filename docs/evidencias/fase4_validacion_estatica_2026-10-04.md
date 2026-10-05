@@ -66,7 +66,11 @@ Rama: `feature/ingesta-dask`
 
 ## Pendiente
 
-- Ejecutar la carga completa y conservar `reporte_limpieza.json`.
+- Confirmar idempotencia de la carga completa en la siguiente ejecución de `bdgeo-main`.
+- Continuar con Fase 5 después del cierre del Gate 4.
+
+La carga completa se documenta en `gate4_carga_completa_2026-10-04.md` y su reporte original se
+conserva en `reporte_limpieza_completo_2026-10-04.json`.
 
 ## Incidencia de red antes de la prueba idempotente
 
