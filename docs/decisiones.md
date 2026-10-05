@@ -157,3 +157,52 @@ completo (riesgo R6). Además verifican el orden `[lon, lat]` (riesgo R11).
 **Decisión.** MongoDB rechaza documentos cuyo `location` no sea un `Point` GeoJSON con
 `[longitud, latitud]` numéricos y dentro de rango. Es una segunda línea de defensa después de
 la limpieza en Dask, y aporta al criterio "GeoJSON válido" de la rúbrica.
+
+---
+
+## D13 — Grilla de 0,005° como unidad espacial de agregación en Spark
+**Estado:** Propuesta (4-oct-2026, F6)
+
+**Contexto.** El enunciado pide agregaciones espaciales "por celda de una grilla o por geohash"
+e identificar zonas de alta concentración.
+
+**Alternativas.** Geohash de precisión 6 (≈ 1,2 km × 0,6 km) o grilla regular en grados.
+
+**Decisión.** Grilla regular: `celda_x = floor(lon / 0.005)` y `celda_y = floor(lat / 0.005)`.
+En la latitud de NYC cada celda mide ≈ 555 m (norte-sur) × 420 m (este-oeste). El tamaño es
+parámetro (`--celda`), así que puede cambiarse en la sustentación sin tocar el código.
+
+**Justificación.**
+- Se calcula con dos operaciones aritméticas, sin librerías externas en la imagen de Spark.
+- Cada celda se guarda también como polígono GeoJSON, lo que permite contrastarla con
+  `$geoWithin` en MongoDB (D15) y dibujarla en un mapa.
+- ~500 m es una escala útil para hablar de "intersecciones o tramos peligrosos"; el geohash 6
+  mezcla zonas demasiado distintas en Manhattan.
+- Es la misma operación que se usará en el benchmark Dask vs Spark (D5).
+
+---
+
+## D14 — Proyección en MongoDB antes de leer con Spark
+**Estado:** Propuesta (4-oct-2026, F6)
+
+**Decisión.** Los jobs leen con la opción `aggregation.pipeline` del MongoDB Spark Connector y
+un `$project` que deja solo lon, lat, hora, día, mes, heridos, muertos y borough.
+
+**Justificación.** MongoDB filtra los campos antes de enviarlos por la red, de modo que Spark
+no transfiere calles, códigos postales ni el texto de la fuente. Además resuelve en origen los
+valores ausentes (`$ifNull`), lo que permite usar el mismo código sobre la semilla.
+
+---
+
+## D15 — Verificación de los resultados de Spark en cada build
+**Estado:** Propuesta (4-oct-2026, F6)
+
+**Decisión.** `verificar_resultados.py` comprueba sumas de control (grilla, hora, día y mes
+deben sumar el total de documentos) y cruza el hotspot #1 con un `$geoWithin` en MongoDB
+(tolerancia ±0,5 %). Cada build de Jenkins corre los jobs y la verificación sobre la semilla,
+con salidas `spark_semilla_*`, para no sobrescribir los resultados reales que sirve la API.
+Los datos reales se recalculan solo en `bdgeo-main`, con `EJECUTAR_SPARK` o si aún no
+existen resultados.
+
+**Justificación.** Cumple el criterio "resultados espaciales coherentes y verificables" con una
+prueba automática que detiene el pipeline, y mantiene el build normal en pocos minutos.
