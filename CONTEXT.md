@@ -1,8 +1,14 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v37 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v38 (5-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v38:** F8 iniciada por Santiago en `feature/benchmark` (rama basada en
+> `feature/spark-agregaciones`, PR #4 aún sin fusionar): `bench_dask.py`, `bench_spark.py`,
+> `medir.ps1` (PowerShell, Windows), `resumen.py` y protocolo en `benchmark/README.md`.
+> Decisiones D16 y D17. Ambos motores probados en local sobre datos sintéticos (mismo top 1);
+> falta correr las 16 corridas sobre los datos reales.
 >
 > **Cambios en v37:** PR #3 fusionado a `main` (merge 43405ef, revisado y aprobado por Santiago
 > Villamizar). F6 iniciada por Santiago en `feature/spark-agregaciones`: jobs
@@ -257,6 +263,8 @@ El detalle y la justificación están en `docs/decisiones.md`, que es la fuente 
 | D13 | Grilla de 0,005° (≈ 500 m) como unidad espacial de Spark | Propuesta (F6) |
 | D14 | Proyección `$project` en MongoDB antes de leer con Spark | Propuesta (F6) |
 | D15 | Verificación automática de Spark: sumas de control + cruce con `$geoWithin` | Propuesta (F6) |
+| D16 | Benchmark: conteo por celda sin sumar heridos (el Parquet no trae esa columna) | Propuesta (F8) |
+| D17 | Benchmark: particiones de shuffle de Spark = núcleos del clúster | Propuesta (F8) |
 
 **Nota sobre D1:** si el docente pidiera expresamente usar Atlas, solo cambia la cadena de
 conexión. Pero no se espera respuesta para avanzar.
@@ -537,7 +545,8 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F4: PR #1 fusionado y carga completa aprobada.**
 - [x] **F4: idempotencia confirmada sobre los 1.741.828 documentos; Gate 4 cerrado.**
 - [x] **F5: PR #3 fusionado a `main` (43405ef).**
-- [ ] **F6: código escrito en `feature/spark-agregaciones`; falta validar en Docker (semilla y datos reales), PR y Jenkins.**
+- [ ] **F6: validada en Docker con la semilla (RESULTADO: OK); PR #4 abierto, falta revisión, merge y corrida sobre datos reales.**
+- [ ] **F8: scripts del benchmark listos en `feature/benchmark`; falta cargar los datos reales en el PC de Santiago y medir.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 en desarrollo (Santiago).**
 

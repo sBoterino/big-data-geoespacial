@@ -206,3 +206,37 @@ existen resultados.
 
 **Justificación.** Cumple el criterio "resultados espaciales coherentes y verificables" con una
 prueba automática que detiene el pipeline, y mantiene el build normal en pocos minutos.
+
+---
+
+## D16 — Operación del benchmark: conteo por celda sin sumar heridos
+**Estado:** Propuesta (5-oct-2026, F8)
+
+**Contexto.** El plan proponía "contar por celda y sumar los heridos". El Parquet que escribe
+la ingesta (`PARQUET_COLUMNAS` en `ingest/pipeline_ingesta.py`) no incluye `personas_heridas`.
+
+**Alternativas.** Agregar la columna al Parquet, lo que obliga a modificar la ingesta y a
+recargar con `FORCE_RELOAD`, o medir solo el conteo.
+
+**Decisión.** El benchmark cuenta puntos por celda y obtiene el top 20 y el total de filas.
+
+**Justificación.** La parte costosa es la lectura, el cálculo de celdas y el shuffle del
+`groupBy`; una suma adicional no cambia la comparación. Se evita tocar la ingesta, que ya está
+aprobada (Gate 4), a cuatro días de la entrega.
+
+---
+
+## D17 — Particiones de shuffle de Spark iguales al número de núcleos
+**Estado:** Propuesta (5-oct-2026, F8)
+
+**Contexto.** Spark usa por defecto `spark.sql.shuffle.partitions = 200`, un valor pensado para
+clústeres grandes. En una prueba local con 200.000 filas y 2 núcleos, el `groupBy` generó 200
+tareas diminutas y tardó 9,5 s; con 2 particiones tardó 3,7 s.
+
+**Decisión.** `bench_spark.py` fija las particiones de shuffle en el número de núcleos del
+clúster (2 en la config A, 4 en la B). El valor queda registrado en la salida y puede
+cambiarse con `--shuffle`.
+
+**Justificación.** Dask no tiene ese sobrecosto por defecto: su `groupby` produce una sola
+partición de salida. Sin el ajuste se compararía la configuración por defecto y no los motores.
+El ajuste se declara en el informe como parte del análisis.
