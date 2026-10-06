@@ -1,7 +1,7 @@
 // Pipeline CI/CD — Big Data Geoespacial
 //
 // Flujo: checkout -> build -> pytest -> [Kaggle] -> levantar servicios -> integración
-//        -> API en staging + smoke tests -> DESPLIEGUE -> verificación.
+//        -> procesamiento Spark -> API en staging + smoke tests -> DESPLIEGUE -> verificación.
 // Si cualquier etapa falla, las siguientes no se ejecutan: un fallo NUNCA llega a producción.
 //
 // Credenciales requeridas en Jenkins (ver docs/guia_fase2.md):
@@ -29,6 +29,8 @@ pipeline {
             description: 'Comprueba que la credencial de Kaggle funciona y el dataset es accesible')
         booleanParam(name: 'FORCE_RELOAD', defaultValue: false,
             description: 'Fuerza la recarga completa del dataset aunque ya exista una ingesta válida')
+        booleanParam(name: 'EJECUTAR_SPARK', defaultValue: false,
+            description: 'Recalcula las agregaciones Spark sobre los datos reales (solo bdgeo-main)')
     }
 
     environment {
@@ -130,6 +132,42 @@ pipeline {
                     docker compose run --rm dask-job python check_cluster.py
                     echo "== Spark: MongoDB Spark Connector =="
                     docker compose exec -T spark-master /opt/spark/bin/spark-submit /opt/jobs/check_conexion.py
+                '''
+            }
+        }
+
+        stage('Procesamiento Spark') {
+            // F6. En TODOS los builds: agregaciones sobre la semilla (salen a spark_semilla_*,
+            // nunca a las colecciones que consulta la API) y verificación con conteos conocidos.
+            // Solo en bdgeo-main: recalcula sobre los datos reales si se pide con EJECUTAR_SPARK
+            // o si todavía no existen resultados (spark_meta sin los registros de los jobs).
+            steps {
+                sh '''
+                    . jenkins/ci-env.sh
+                    SUBMIT="docker compose exec -T spark-master /opt/spark/bin/spark-submit"
+
+                    echo "== Spark sobre eventos_semilla =="
+                    $SUBMIT /opt/jobs/agregacion_grilla.py --coleccion eventos_semilla
+                    $SUBMIT /opt/jobs/agregacion_temporal.py --coleccion eventos_semilla
+                    $SUBMIT /opt/jobs/verificar_resultados.py --coleccion eventos_semilla
+
+                    if [ "${JOB_NAME}" != "bdgeo-main" ]; then
+                        echo "Job de rama: no se escriben resultados reales."
+                        exit 0
+                    fi
+
+                    EXISTENTES=$(docker compose exec -T mongodb sh -c \
+                        'mongosh --quiet -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin "$MONGO_DB" --eval "db.spark_meta.countDocuments({_id: /^(grilla|temporal)$/})"' | tr -d '[:space:]')
+                    echo "Registros previos en spark_meta: ${EXISTENTES}"
+
+                    if [ "${EJECUTAR_SPARK}" = "true" ] || [ "${EXISTENTES}" != "2" ]; then
+                        echo "== Spark sobre eventos (datos reales) =="
+                        $SUBMIT /opt/jobs/agregacion_grilla.py
+                        $SUBMIT /opt/jobs/agregacion_temporal.py
+                        $SUBMIT /opt/jobs/verificar_resultados.py
+                    else
+                        echo "Agregaciones reales ya calculadas: se omiten (usar EJECUTAR_SPARK para recalcular)."
+                    fi
                 '''
             }
         }

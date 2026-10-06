@@ -1,8 +1,15 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v36 (4-oct-2026)
+## Contexto maestro transferible entre IAs — v37 (4-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v37:** PR #3 fusionado a `main` (merge 43405ef, revisado y aprobado por Santiago
+> Villamizar). F6 iniciada por Santiago en `feature/spark-agregaciones`: jobs
+> `agregacion_grilla.py`, `agregacion_temporal.py` y `verificar_resultados.py`, etapa
+> "Procesamiento Spark" en el Jenkinsfile y decisiones D13–D15. Lógica probada en Spark local
+> sobre la semilla (300 puntos, hotspot #1 con n=57 a ~200 m de Times Square); falta validarla
+> en Docker contra MongoDB y luego sobre los 1.741.828 documentos.
 >
 > **Cambios en v36:** antes de validar el PR #3 se detectó que un job de rama con
 > `INGEST_MAX_ROWS=50000` podía reemplazar la colección completa. La etapa de ingesta quedó
@@ -247,6 +254,9 @@ El detalle y la justificación están en `docs/decisiones.md`, que es la fuente 
 | D10 | Deploy = imagen `bdgeo-api:<BUILD>` → staging + smoke → promoción a `api` → verificación | Aprobada |
 | D11 | Datos semilla deterministas (300 puntos, conteos conocidos) para las pruebas | Aprobada |
 | D12 | Validador `$jsonSchema` de GeoJSON en MongoDB | Aprobada |
+| D13 | Grilla de 0,005° (≈ 500 m) como unidad espacial de Spark | Propuesta (F6) |
+| D14 | Proyección `$project` en MongoDB antes de leer con Spark | Propuesta (F6) |
+| D15 | Verificación automática de Spark: sumas de control + cruce con `$geoWithin` | Propuesta (F6) |
 
 **Nota sobre D1:** si el docente pidiera expresamente usar Atlas, solo cambia la cadena de
 conexión. Pero no se espera respuesta para avanzar.
@@ -526,9 +536,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F4: GeoJSON e índices verificados directamente en la muestra.**
 - [x] **F4: PR #1 fusionado y carga completa aprobada.**
 - [x] **F4: idempotencia confirmada sobre los 1.741.828 documentos; Gate 4 cerrado.**
-- [ ] **F5: unitarias, semilla 120/120/120 y datos reales aprobados; falta PR/Jenkins.**
+- [x] **F5: PR #3 fusionado a `main` (43405ef).**
+- [ ] **F6: código escrito en `feature/spark-agregaciones`; falta validar en Docker (semilla y datos reales), PR y Jenkins.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 en validación.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 en desarrollo (Santiago).**
 
 ---
 
