@@ -2,7 +2,8 @@
 F8 — Benchmark: agregación por grilla con Spark.
 
 Operación (idéntica en bench_dask.py):
-  1. Leer latitude y longitude de /data/parquet/eventos (Parquet generado por la ingesta).
+  1. Leer latitude y longitude del Parquet: /data/parquet/eventos (ingesta, ×1) o
+     /data/parquet/eventos_x10 (copia física ×10 creada con preparar_volumen.py, D18).
   2. Asignar cada punto a su celda: floor(lon / celda), floor(lat / celda).
   3. Contar puntos por celda.
   4. Obtener el top 20 de celdas y el total de filas procesadas.
@@ -19,9 +20,8 @@ import argparse
 import json
 import os
 import time
-from functools import reduce
 
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
 
@@ -38,8 +38,6 @@ def main():
     p.add_argument("--workers", type=int, required=True, help="workers esperados (1 o 2)")
     p.add_argument("--shuffle", type=int, default=0,
                    help="particiones del shuffle; 0 = una por núcleo del clúster (ver D17)")
-    p.add_argument("--replicas", type=int, default=1,
-                   help="lee el Parquet N veces para simular N veces más datos (D18)")
     args = p.parse_args()
 
     t0 = time.perf_counter()
@@ -63,9 +61,7 @@ def main():
     arranque = time.perf_counter() - t0
 
     inicio = time.perf_counter()
-    lecturas = [spark.read.parquet(args.ruta).select("latitude", "longitude")
-                for _ in range(args.replicas)]
-    df = reduce(DataFrame.unionAll, lecturas)
+    df = spark.read.parquet(args.ruta).select("latitude", "longitude")
     conteo = (df.groupBy(F.floor(F.col("longitude") / args.celda).alias("cx"),
                          F.floor(F.col("latitude") / args.celda).alias("cy"))
               .count()
@@ -78,7 +74,6 @@ def main():
         "motor": "spark",
         "workers": workers,
         "nucleos": nucleos,
-        "replicas": args.replicas,
         "particiones": df.rdd.getNumPartitions(),
         "shuffle": int(spark.conf.get("spark.sql.shuffle.partitions")),
         "segundos": round(segundos, 3),

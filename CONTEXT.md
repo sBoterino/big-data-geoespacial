@@ -1,16 +1,23 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v38 (5-oct-2026)
+## Contexto maestro transferible entre IAs — v39 (6-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v39:** PR #4 fusionado (89a7498) y **Gate 6 cerrado con `bdgeo-main` #9**
+> (agregaciones Spark sobre los datos reales, según la ejecución en el Jenkins de Sebastián).
+> PR #5 (F8) corregido tras la revisión de Sebastián: el ×10 lógico (`dd.concat`/`unionAll`)
+> estaba sesgado porque Dask leía una vez y Spark diez; se reemplazó por un Parquet físico ×10
+> (`preparar_volumen.py`, D18) y se repitieron las 16 corridas. Resultados ×10: Dask 2,36/1,39 s,
+> Spark 4,51/5,12 s (A/B). La memoria se reporta como pico observado y la posible convergencia
+> de Spark como hipótesis no medida.
 >
 > **Cambios en v38:** F8 iniciada por Santiago en `feature/benchmark` (rama basada en
 > `feature/spark-agregaciones`, PR #4 aún sin fusionar): `bench_dask.py`, `bench_spark.py`,
 > `medir.ps1` (PowerShell, Windows), `resumen.py` y protocolo en `benchmark/README.md`.
 > Decisiones D16 y D17. Ambos motores probados en local sobre datos sintéticos (mismo top 1);
 > falta correr las 16 corridas sobre los datos reales. **Actualización:** medidas 32 corridas
-> (×1 y ×10, D18). Dask fue 3–23 veces más rápido y usó menos memoria; la ventaja bajó de ×13 a
-> ×3 con 10 veces más datos; Spark no mejoró con un segundo worker en el mismo PC. Ambos
+> (×1 y ×10, D18). (cifras ×10 reemplazadas en v39). Ambos
 > motores dieron el mismo top 1 (celda -14799_8151, n=5.336). La ingesta completa se reprodujo
 > en el PC de Santiago con los mismos conteos (evidencia parcial de F9).
 >
@@ -269,7 +276,7 @@ El detalle y la justificación están en `docs/decisiones.md`, que es la fuente 
 | D15 | Verificación automática de Spark: sumas de control + cruce con `$geoWithin` | Propuesta (F6) |
 | D16 | Benchmark: conteo por celda sin sumar heridos (el Parquet no trae esa columna) | Propuesta (F8) |
 | D17 | Benchmark: particiones de shuffle de Spark = núcleos del clúster | Propuesta (F8) |
-| D18 | Benchmark: prueba de volumen leyendo el Parquet ×10 (17,4 M filas) | Propuesta (F8) |
+| D18 | Benchmark: prueba de volumen con un Parquet físico ×10 (17,4 M filas) | Propuesta (F8) |
 
 **Nota sobre D1:** si el docente pidiera expresamente usar Atlas, solo cambia la cadena de
 conexión. Pero no se espera respuesta para avanzar.
@@ -550,11 +557,11 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F4: PR #1 fusionado y carga completa aprobada.**
 - [x] **F4: idempotencia confirmada sobre los 1.741.828 documentos; Gate 4 cerrado.**
 - [x] **F5: PR #3 fusionado a `main` (43405ef).**
-- [ ] **F6: validada en Docker con la semilla (RESULTADO: OK); PR #4 abierto, falta revisión, merge y corrida sobre datos reales.**
-- [x] **F8: benchmark medido en el PC de Santiago (32 corridas, ×1 y ×10); resultados, gráficas y análisis en `docs/evidencias/fase8_benchmark_2026-10-05.md`. Falta PR.**
+- [x] **F6: PR #4 fusionado (89a7498); Gate 6 cerrado con `bdgeo-main` #9 sobre los datos reales.**
+- [ ] **F8: benchmark medido en el PC de Santiago (32 corridas válidas, ×1 y ×10 físico); PR #5 corregido según la revisión, pendiente de aprobación y merge.**
 - [x] **F9 (parcial): ingesta completa reproducida en un segundo computador (PC de Santiago): 1.741.828 documentos en 56,3 s, mismos conteos de limpieza.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 en desarrollo (Santiago).**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 cerrada (`bdgeo-main` #9) · F8 en revisión (PR #5).**
 
 ---
 

@@ -243,22 +243,24 @@ El ajuste se declara en el informe como parte del análisis.
 
 ---
 
-## D18 — Prueba de volumen del benchmark con el Parquet leído 10 veces
-**Estado:** Propuesta (5-oct-2026, F8)
+## D18 — Prueba de volumen del benchmark con un Parquet físico ×10
+**Estado:** Propuesta (5-oct-2026, F8; corregida el 6-oct-2026)
 
 **Contexto.** Con las 1.741.828 filas reales, Dask calculó en 0,20–0,30 s y Spark en
-3,8–4,7 s, y Spark fue más lento con 2 workers que con 1. Con tan poco trabajo domina el
-sobrecosto de coordinación, y la medición no permite ver en qué condiciones conviene Spark.
+3,8–4,7 s. Con tan poco trabajo domina el sobrecosto de coordinación, y no se puede ver cómo
+cambia la comparación con más datos.
 
-**Alternativas.** Generar y guardar un dataset sintético más grande, o leer el mismo Parquet
-varias veces dentro de cada motor.
+**Primer intento (descartado).** Concatenar N lecturas del mismo Parquet dentro de cada motor
+(`dd.concat([base] * N)` en Dask, `unionAll` en Spark). La revisión del PR #5 lo cuestionó y la
+comprobación mostró el sesgo: Dask reconoce las N lecturas como la misma tarea y lee el Parquet
+una sola vez, mientras que Spark lo lee N veces.
 
-**Decisión.** Las dos implementaciones aceptan `--replicas N`, que concatena N lecturas del
-mismo Parquet (`dd.concat` en Dask, `unionAll` en Spark). Con N = 10 se procesan
-17.418.280 filas sin ocupar más disco. Se corre el mismo protocolo (A y B, 1 calentamiento y
-3 repeticiones) y el resumen separa ambos volúmenes.
+**Decisión.** `benchmark/preparar_volumen.py` copia cada archivo del Parquet N veces a
+`/data/parquet/eventos_xN` (con N = 10: 60 archivos, 295 MB, 17.418.280 filas) y verifica que
+el total de filas sea exactamente N veces el original. Ambos motores leen esa carpeta como
+cualquier otro Parquet. Se corre el mismo protocolo (A y B, 1 calentamiento y 3 repeticiones).
 
-**Justificación.** Mantiene la misma operación, la misma fuente y los mismos recursos (D5) y
-solo cambia el volumen. El resultado es verificable: el top 1 debe ser exactamente 10 veces
-el de la prueba con ×1. La limitación —los datos repetidos no aportan diversidad— se declara
-en el informe.
+**Justificación.** Misma operación, misma fuente física y mismos recursos para los dos motores
+(D5); solo cambia el volumen. Es verificable: el top 1 debe ser exactamente N veces el de ×1.
+**Limitación declarada:** son filas repetidas; miden lectura y agrupación de más filas, no
+datos más diversos.

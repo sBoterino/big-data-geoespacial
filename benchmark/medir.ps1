@@ -16,7 +16,7 @@ param(
     [Parameter(Mandatory = $true)][ValidateSet("dask", "spark")][string]$Motor,
     [Parameter(Mandatory = $true)][ValidateSet("A", "B")][string]$Config,
     [Parameter(Mandatory = $true)][int]$Repeticion,
-    [int]$Replicas = 1   # >1 = lee el Parquet N veces (prueba de volumen, D18)
+    [int]$Replicas = 1   # 10 = lee /data/parquet/eventos_x10, copia física ×10 (D18)
 )
 # "Continue": Spark y Dask escriben sus logs por stderr; con "Stop", PowerShell 5.1 los
 # trataría como errores y cortaría la corrida.
@@ -25,6 +25,7 @@ $raiz = Split-Path -Parent $PSScriptRoot
 Set-Location $raiz
 
 $workers = if ($Config -eq "A") { 1 } else { 2 }
+$ruta = if ($Replicas -gt 1) { "/data/parquet/eventos_x$Replicas" } else { "/data/parquet/eventos" }
 $contenedores = if ($Motor -eq "dask") {
     @("bdgeo-dask-scheduler-1", "bdgeo-dask-worker-1-1", "bdgeo-dask-worker-2-1")
 } else {
@@ -69,12 +70,12 @@ function A-MiB([string]$texto) {
 Start-Sleep -Seconds 2   # muestras de referencia antes de empezar
 if ($Motor -eq "dask") {
     $salida = docker compose run --rm -v "${raiz}\benchmark:/opt/bench" dask-job `
-        python /opt/bench/bench_dask.py --workers $workers --replicas $Replicas 2>&1
+        python /opt/bench/bench_dask.py --workers $workers --ruta $ruta 2>&1
 } else {
     # Solo el driver necesita el script; /tmp es escribible por el usuario "spark" de la imagen.
     docker compose cp benchmark/bench_spark.py spark-master:/tmp/bench_spark.py | Out-Null
     $salida = docker compose exec -T spark-master /opt/spark/bin/spark-submit `
-        /tmp/bench_spark.py --workers $workers --replicas $Replicas 2>&1
+        /tmp/bench_spark.py --workers $workers --ruta $ruta 2>&1
 }
 Start-Sleep -Seconds 2
 Stop-Job $muestreo; Remove-Job $muestreo

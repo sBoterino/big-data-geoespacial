@@ -2,7 +2,8 @@
 F8 — Benchmark: agregación por grilla con Dask.
 
 Operación (idéntica en bench_spark.py):
-  1. Leer latitude y longitude de /data/parquet/eventos (Parquet generado por la ingesta).
+  1. Leer latitude y longitude del Parquet: /data/parquet/eventos (ingesta, ×1) o
+     /data/parquet/eventos_x10 (copia física ×10 creada con preparar_volumen.py, D18).
   2. Asignar cada punto a su celda: floor(lon / celda), floor(lat / celda).
   3. Contar puntos por celda.
   4. Obtener el top 20 de celdas y el total de filas procesadas.
@@ -32,8 +33,6 @@ def main():
     p.add_argument("--celda", type=float, default=0.005)
     p.add_argument("--top", type=int, default=20)
     p.add_argument("--workers", type=int, required=True, help="workers esperados (1 o 2)")
-    p.add_argument("--replicas", type=int, default=1,
-                   help="lee el Parquet N veces para simular N veces más datos (D18)")
     args = p.parse_args()
 
     t0 = time.perf_counter()
@@ -46,8 +45,7 @@ def main():
     arranque = time.perf_counter() - t0
 
     inicio = time.perf_counter()
-    base = dd.read_parquet(args.ruta, columns=["latitude", "longitude"])
-    df = dd.concat([base] * args.replicas) if args.replicas > 1 else base
+    df = dd.read_parquet(args.ruta, columns=["latitude", "longitude"])
     df = df.assign(
         cx=np.floor(df["longitude"] / args.celda).astype("int64"),
         cy=np.floor(df["latitude"] / args.celda).astype("int64"),
@@ -62,7 +60,6 @@ def main():
         "motor": "dask",
         "workers": workers,
         "nucleos": hilos,
-        "replicas": args.replicas,
         "particiones": df.npartitions,
         "segundos": round(segundos, 3),
         "arranque_s": round(arranque, 3),
