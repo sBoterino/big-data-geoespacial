@@ -46,7 +46,7 @@ seguir el despliegue y explicar por qué está construido así.
 | GeoJSON e índice 2dsphere | **Validado con carga completa** | Auditoría posterior a `bdgeo-main` #6 | Documento real `Point [-74.00231, 40.59662]`; índices `_id_`, `fecha_1` y `location_2dsphere` |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Endpoints y Spark ya existen; falta ensayar el cambio con rama, PR, merge y Jenkins (simulacro del 8-oct) |
 | Consulta con otro polígono | **Validada con semilla y datos reales** | `fase5_semilla_2026-10-04.md`, `fase5_datos_reales_2026-10-04.md` | `/within` recibe cualquier `Polygon` GeoJSON válido; cambiar el polígono no exige cambiar código |
-| Pruebas de consultas API | **F7 aprobada en rama** | `bdgeo-fase7-test` #1, evidencia F7 | 30 pruebas API, 5 de ingesta y staging 120/120/120 + Spark 7/57/23; build completo en 2 min 19 s |
+| Pruebas de consultas API | **Gate 7 cerrado** | `bdgeo-fase7-test` #1/#2/#4 y `bdgeo-main` #11 | 30 pruebas API, 5 de ingesta, 4 de Spark, staging 120/120/120 + 7/57/23 y API v11 desplegada |
 | Pruebas puras de Spark | **Aprobadas en Jenkins** | `bdgeo-fase7-test` #1, `spark/tests/test_agregaciones.py` | 4 pruebas de grilla, GeoJSON `[lon, lat]`, sumas, ranking, temporal y Haversine en 6,251 s |
 | Staging seguro en ramas | **Demostrado** | `bdgeo-fase7-test` #1 | Usa `eventos_semilla` y `spark_semilla_*`; staging pasó y `Despliegue` fue omitido, sin cambiar producción |
 | Bloqueo con pipeline final | **Demostrado** | `bdgeo-fase7-test` #2 | `FORZAR_FALLO=true`: 30 aprobadas, 1 fallo intencional; Kaggle, servicios, integración, Spark, staging y deploy omitidos |

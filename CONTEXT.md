@@ -1,8 +1,13 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v42 (6-oct-2026)
+## Contexto maestro transferible entre IAs — v43 (6-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v43:** PR #6 fusionado (`71fd7fb`) y Gate 7 cerrado con `bdgeo-main` #11:
+> `SUCCESS` en 1 min 52 s, 30 pruebas API, 5 de ingesta, 4 de Spark, integraciones, staging
+> 120/120/120 + 7/57/23 y despliegue de la API versión 11. La ingesta idempotente conservó
+> 1.741.828 documentos. El push del merge fue realizado por `gitsILLO69`.
 >
 > **Cambios en v42:** validación Jenkins de F7 aprobada en `bdgeo-fase7-test` #1: `SUCCESS`
 > en 2 min 19 s, 30 pruebas API, 5 de ingesta, 4 de Spark, integraciones y staging
@@ -575,10 +580,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F5: PR #3 fusionado a `main` (43405ef).**
 - [x] **F6: PR #4 fusionado (89a7498); Gate 6 cerrado con `bdgeo-main` #9 sobre los datos reales.**
 - [x] **F8: benchmark medido en el PC de Santiago (32 corridas válidas, ×1 y ×10 físico); metodología aprobada en la revisión del PR #5.**
-- [ ] **F7: rama aprobada en Jenkins (`bdgeo-fase7-test` #1 normal y #2 con fallo bloqueado); falta revisar/fusionar PR #6 y validar `bdgeo-main`.**
+- [x] **F7: PR #6 fusionado; Gate 7 cerrado con `bdgeo-main` #11, API versión 11 desplegada.**
 - [x] **F9 (parcial): ingesta completa reproducida en un segundo computador (PC de Santiago): 1.741.828 documentos en 56,3 s, mismos conteos de limpieza.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 cerrada (`bdgeo-main` #9) · F8 cerrada (PR #5) · F7 aprobada en rama y pendiente de merge/main · F9, F10 y F11 pendientes.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2, F4, F5, F6, F7 y F8 cerradas · API versión 11 desplegada · F9, F10 y F11 pendientes.**
 
 ---
 
@@ -678,19 +683,15 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 # 14. PRÓXIMA ACCIÓN EXACTA
 
-> Actualizado el 6-oct-2026. F2, F4, F5, F6 y F8 están cerradas; F7 aprobó Jenkins en rama.
+> Actualizado el 6-oct-2026. F2, F4, F5, F6, F7 y F8 están cerradas.
 
-1. **F7 — cerrar merge.** Solicitar revisión de otro integrante para el PR #6, fusionarlo y
-   comprobar que el `bdgeo-main` disparado por webhook termina `SUCCESS`, despliega la nueva
-   versión y conserva `/health`. La rama ya aprobó el flujo normal (#1, 2 min 19 s) y el fallo
-   bloqueante (#2).
-2. **F9 — reproducibilidad.** Juan Guillermo clona el repositorio en su computador y levanta el
+1. **F9 — reproducibilidad.** Juan Guillermo clona el repositorio en su computador y levanta el
    sistema siguiendo solo el README; registrar lo que falle y corregir el README (sus commits).
-3. **F10 — documentación.** README final e informe técnico (≤ 10 páginas) en `docs/informe/`,
+2. **F10 — documentación.** README final e informe técnico (≤ 10 páginas) en `docs/informe/`,
    con arquitectura, decisiones D1–D18, consultas, Spark y benchmark (evidencias F4–F8).
-4. **F0 — confirmar** que el registro del dataset (`docs/registro_dataset_docente.md`) se envió
+3. **F0 — confirmar** que el registro del dataset (`docs/registro_dataset_docente.md`) se envió
    al docente.
-5. **F11 — simulacro (8-oct):** congelar `main`, cambio en vivo por integrante y ronda de
+4. **F11 — simulacro (8-oct):** congelar `main`, cambio en vivo por integrante y ronda de
    preguntas cruzadas con `docs/guia_sustentacion.md`.
 
 ---

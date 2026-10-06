@@ -7,7 +7,7 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
-> Estado: **F2, F4, F5, F6 (Gate 6, `bdgeo-main` #9) y F8 cerradas; F7 aprobó el job de rama normal y el bloqueo por fallo, y espera revisión/merge del PR #6; continúan F9 y F10**.
+> Estado: **F2, F4, F5, F6, F7 (`bdgeo-main` #11, API v11) y F8 cerradas; continúan la reproducibilidad F9, el informe F10 y el simulacro F11**.
 > Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset

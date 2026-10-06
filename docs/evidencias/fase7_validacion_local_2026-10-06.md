@@ -62,6 +62,18 @@ de tres reintentos permitió completar el build; no fue un fallo del código ni 
 
 Esto demuestra con el pipeline final que una prueba rota detiene la promoción de la imagen.
 
+### Build de producción #11 — cierre después del merge
+
+- PR #6 revisado y fusionado; merge `71fd7fb` en `main`.
+- Inicio automático por push de GitHub de `gitsILLO69`.
+- Resultado: `SUCCESS` en aproximadamente 1 min 52 s (00:52:09–00:54:01).
+- API: 30 aprobadas y 1 trampa omitida; ingesta: 5 aprobadas; Spark puro: 4 aprobadas.
+- La ingesta idempotente conservó 1.741.828 documentos.
+- Integraciones Dask/Spark y verificación Spark sobre semilla aprobadas.
+- Staging versión 11: 120/120/120 y resultados Spark 7/57/23.
+- Producción recreada desde la misma imagen candidata; `/health` respondió `version=11`.
+- Mensaje final: `OK: build 11 desplegado`.
+
 ## Evidencia previa útil
 
 `bdgeo-main` #10 terminó en aproximadamente 1 min 54 s, por debajo de la meta de 5 minutos,
@@ -74,4 +86,6 @@ pruebas de esta rama.
 1. [x] Job de la rama en `SUCCESS`, incluida la nueva suite Spark y staging 120/120/120 + 7/57/23.
 2. [x] Mismo job con `FORZAR_FALLO=true` en `FAILURE`, sin ejecutar staging ni despliegue.
 3. [x] Build normal inferior a 5 minutos.
-4. [ ] Merge mediante PR revisado y `bdgeo-main` en `SUCCESS`.
+4. [x] Merge mediante PR revisado y `bdgeo-main` #11 en `SUCCESS`.
+
+**Gate 7 cerrado.**
