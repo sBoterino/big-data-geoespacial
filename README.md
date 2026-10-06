@@ -7,7 +7,7 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
-> Estado: **Gate 2 aprobado; Fase 4 y Gate 4 aprobados; siguiente foco: Fase 5 — API geoespacial**.
+> Estado: **F2, F4, F5, F6 (Gate 6, `bdgeo-main` #9) y F8 (benchmark) cerradas; en curso: pruebas finales (F7), reproducibilidad (F9) e informe (F10)**.
 > Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset
@@ -93,8 +93,46 @@ docs/         Decisiones, evidencias e informe
 | GET | `/spark-results` | Colecciones permitidas generadas por Spark |
 | GET | `/spark-results/<nombre>` | Resultados calculados por Spark |
 
-Los endpoints de F5 están implementados y en validación. Todas las consultas aceptan parámetros,
-rechazan entradas inválidas con HTTP 400 y reportan `tiempo_ms`.
+Todas las consultas aceptan parámetros, rechazan entradas inválidas con HTTP 400 y reportan
+`tiempo_ms`. `/spark-results/<nombre>` acepta `grilla`, `hotspots`, `por_hora`,
+`por_dia_semana`, `por_mes`, `hora_borough` y `meta`.
+
+## Agregaciones con Spark (F6)
+
+Tres jobs en `spark/jobs/`, que leen desde MongoDB con el MongoDB Spark Connector y una
+proyección `$project` hecha en MongoDB (D14):
+
+| Job | Resultado |
+|---|---|
+| `agregacion_grilla.py` | `spark_grilla` (celdas de 0,005° ≈ 500 m con n, heridos, muertos y polígono GeoJSON) y `spark_hotspots` (top 20) |
+| `agregacion_temporal.py` | `spark_por_hora`, `spark_por_dia_semana`, `spark_por_mes`, `spark_hora_borough` |
+| `verificar_resultados.py` | Sumas de control contra el total de documentos y cruce del hotspot #1 con `$geoWithin` (±0,5 %) |
+
+```bash
+docker compose exec spark-master spark-submit /opt/jobs/agregacion_grilla.py            # datos reales
+docker compose exec spark-master spark-submit /opt/jobs/verificar_resultados.py
+docker compose exec spark-master spark-submit /opt/jobs/agregacion_grilla.py --coleccion eventos_semilla
+```
+
+Jenkins corre los jobs y la verificación sobre la semilla en cada build (salida
+`spark_semilla_*`, sin tocar lo que sirve la API) y, en `bdgeo-main`, recalcula sobre los datos
+reales con `EJECUTAR_SPARK=true` o si aún no existen resultados. Gate 6 cerró con `bdgeo-main` #9.
+
+## Benchmark Dask vs Spark (F8)
+
+Misma operación en los dos motores (Parquet de la ingesta, celda de 0,005°, conteo y top 20),
+con 1 y 2 workers y con 1× y 10× (Parquet físico) de volumen. Protocolo y scripts en
+[`benchmark/README.md`](benchmark/README.md); resultados y análisis en
+[`docs/evidencias/fase8_benchmark_2026-10-05.md`](docs/evidencias/fase8_benchmark_2026-10-05.md).
+
+| Datos | Dask (1 / 2 workers) | Spark (1 / 2 workers) |
+|---|---:|---:|
+| ×1 (1.741.828 filas) | 0,30 / 0,20 s | 3,80 / 4,65 s |
+| ×10 (17.418.280 filas) | 2,36 / 1,39 s | 4,51 / 5,12 s |
+
+Dask fue más rápido en todas las combinaciones, pero su ventaja bajó de ×12,7 a ×1,9 al pasar a
+10 veces más filas. Limitaciones: un solo computador, memoria medida como pico observado con
+`docker stats` (~2 s por muestra) y filas repetidas en la prueba ×10.
 
 ## Flujo de trabajo en Git
 

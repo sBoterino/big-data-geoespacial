@@ -161,7 +161,7 @@ la limpieza en Dask, y aporta al criterio "GeoJSON válido" de la rúbrica.
 ---
 
 ## D13 — Grilla de 0,005° como unidad espacial de agregación en Spark
-**Estado:** Propuesta (4-oct-2026, F6)
+**Estado:** Aprobada (Gate 6, `bdgeo-main` #9, 5-oct-2026)
 
 **Contexto.** El enunciado pide agregaciones espaciales "por celda de una grilla o por geohash"
 e identificar zonas de alta concentración.
@@ -183,7 +183,7 @@ parámetro (`--celda`), así que puede cambiarse en la sustentación sin tocar e
 ---
 
 ## D14 — Proyección en MongoDB antes de leer con Spark
-**Estado:** Propuesta (4-oct-2026, F6)
+**Estado:** Aprobada (Gate 6, `bdgeo-main` #9, 5-oct-2026)
 
 **Decisión.** Los jobs leen con la opción `aggregation.pipeline` del MongoDB Spark Connector y
 un `$project` que deja solo lon, lat, hora, día, mes, heridos, muertos y borough.
@@ -195,7 +195,7 @@ valores ausentes (`$ifNull`), lo que permite usar el mismo código sobre la semi
 ---
 
 ## D15 — Verificación de los resultados de Spark en cada build
-**Estado:** Propuesta (4-oct-2026, F6)
+**Estado:** Aprobada (Gate 6, `bdgeo-main` #9, 5-oct-2026)
 
 **Decisión.** `verificar_resultados.py` comprueba sumas de control (grilla, hora, día y mes
 deben sumar el total de documentos) y cruza el hotspot #1 con un `$geoWithin` en MongoDB
@@ -206,3 +206,61 @@ existen resultados.
 
 **Justificación.** Cumple el criterio "resultados espaciales coherentes y verificables" con una
 prueba automática que detiene el pipeline, y mantiene el build normal en pocos minutos.
+
+---
+
+## D16 — Operación del benchmark: conteo por celda sin sumar heridos
+**Estado:** Aprobada (revisión del PR #5, 6-oct-2026)
+
+**Contexto.** El plan proponía "contar por celda y sumar los heridos". El Parquet que escribe
+la ingesta (`PARQUET_COLUMNAS` en `ingest/pipeline_ingesta.py`) no incluye `personas_heridas`.
+
+**Alternativas.** Agregar la columna al Parquet, lo que obliga a modificar la ingesta y a
+recargar con `FORCE_RELOAD`, o medir solo el conteo.
+
+**Decisión.** El benchmark cuenta puntos por celda y obtiene el top 20 y el total de filas.
+
+**Justificación.** La parte costosa es la lectura, el cálculo de celdas y el shuffle del
+`groupBy`; una suma adicional no cambia la comparación. Se evita tocar la ingesta, que ya está
+aprobada (Gate 4), a cuatro días de la entrega.
+
+---
+
+## D17 — Particiones de shuffle de Spark iguales al número de núcleos
+**Estado:** Aprobada (revisión del PR #5, 6-oct-2026)
+
+**Contexto.** Spark usa por defecto `spark.sql.shuffle.partitions = 200`, un valor pensado para
+clústeres grandes. En una prueba local con 200.000 filas y 2 núcleos, el `groupBy` generó 200
+tareas diminutas y tardó 9,5 s; con 2 particiones tardó 3,7 s.
+
+**Decisión.** `bench_spark.py` fija las particiones de shuffle en el número de núcleos del
+clúster (2 en la config A, 4 en la B). El valor queda registrado en la salida y puede
+cambiarse con `--shuffle`.
+
+**Justificación.** Dask no tiene ese sobrecosto por defecto: su `groupby` produce una sola
+partición de salida. Sin el ajuste se compararía la configuración por defecto y no los motores.
+El ajuste se declara en el informe como parte del análisis.
+
+---
+
+## D18 — Prueba de volumen del benchmark con un Parquet físico ×10
+**Estado:** Aprobada (revisión del PR #5, 6-oct-2026; corregida tras la revisión)
+
+**Contexto.** Con las 1.741.828 filas reales, Dask calculó en 0,20–0,30 s y Spark en
+3,8–4,7 s. Con tan poco trabajo domina el sobrecosto de coordinación, y no se puede ver cómo
+cambia la comparación con más datos.
+
+**Primer intento (descartado).** Concatenar N lecturas del mismo Parquet dentro de cada motor
+(`dd.concat([base] * N)` en Dask, `unionAll` en Spark). La revisión del PR #5 lo cuestionó y la
+comprobación mostró el sesgo: Dask reconoce las N lecturas como la misma tarea y lee el Parquet
+una sola vez, mientras que Spark lo lee N veces.
+
+**Decisión.** `benchmark/preparar_volumen.py` copia cada archivo del Parquet N veces a
+`/data/parquet/eventos_xN` (con N = 10: 60 archivos, 295 MB, 17.418.280 filas) y verifica que
+el total de filas sea exactamente N veces el original. Ambos motores leen esa carpeta como
+cualquier otro Parquet. Se corre el mismo protocolo (A y B, 1 calentamiento y 3 repeticiones).
+
+**Justificación.** Misma operación, misma fuente física y mismos recursos para los dos motores
+(D5); solo cambia el volumen. Es verificable: el top 1 debe ser exactamente N veces el de ×1.
+**Limitación declarada:** son filas repetidas; miden lectura y agrupación de más filas, no
+datos más diversos.
