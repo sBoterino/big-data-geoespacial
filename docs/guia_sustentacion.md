@@ -46,9 +46,10 @@ seguir el despliegue y explicar por qué está construido así.
 | GeoJSON e índice 2dsphere | **Validado con carga completa** | Auditoría posterior a `bdgeo-main` #6 | Documento real `Point [-74.00231, 40.59662]`; índices `_id_`, `fecha_1` y `location_2dsphere` |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Endpoints y Spark ya existen; falta ensayar el cambio con rama, PR, merge y Jenkins (simulacro del 8-oct) |
 | Consulta con otro polígono | **Validada con semilla y datos reales** | `fase5_semilla_2026-10-04.md`, `fase5_datos_reales_2026-10-04.md` | `/within` recibe cualquier `Polygon` GeoJSON válido; cambiar el polígono no exige cambiar código |
-| Pruebas de consultas API | **F7 ampliada; Jenkins pendiente** | `fase7_validacion_local_2026-10-06.md` | 30 pruebas API y 5 de ingesta aprobadas localmente; staging verificará 120/120/120 y Spark 7/57/23 antes del merge |
-| Pruebas puras de Spark | **Implementadas; Jenkins pendiente** | `spark/tests/test_agregaciones.py` | Grilla, GeoJSON `[lon, lat]`, sumas, ranking determinista, agregación temporal y Haversine sin depender de MongoDB |
-| Staging seguro en ramas | **Implementado; Jenkins pendiente** | `Jenkinsfile` | La rama prueba `eventos_semilla` y `spark_semilla_*`; solo `bdgeo-main` conserva permiso de despliegue |
+| Pruebas de consultas API | **F7 aprobada en rama** | `bdgeo-fase7-test` #1, evidencia F7 | 30 pruebas API, 5 de ingesta y staging 120/120/120 + Spark 7/57/23; build completo en 2 min 19 s |
+| Pruebas puras de Spark | **Aprobadas en Jenkins** | `bdgeo-fase7-test` #1, `spark/tests/test_agregaciones.py` | 4 pruebas de grilla, GeoJSON `[lon, lat]`, sumas, ranking, temporal y Haversine en 6,251 s |
+| Staging seguro en ramas | **Demostrado** | `bdgeo-fase7-test` #1 | Usa `eventos_semilla` y `spark_semilla_*`; staging pasó y `Despliegue` fue omitido, sin cambiar producción |
+| Bloqueo con pipeline final | **Demostrado** | `bdgeo-fase7-test` #2 | `FORZAR_FALLO=true`: 30 aprobadas, 1 fallo intencional; Kaggle, servicios, integración, Spark, staging y deploy omitidos |
 | Rendimiento de consultas | **Medido** | `fase5_datos_reales_2026-10-04.md` | Promedios calientes: `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms; agrupado 1.786,176 ms |
 | Dominio integral de los tres miembros | **Pendiente de ensayo** | — | Cada integrante debe practicar preguntas y hacer cambios fuera de su componente principal |
 

@@ -1,8 +1,14 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v41 (6-oct-2026)
+## Contexto maestro transferible entre IAs — v42 (6-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v42:** validación Jenkins de F7 aprobada en `bdgeo-fase7-test` #1: `SUCCESS`
+> en 2 min 19 s, 30 pruebas API, 5 de ingesta, 4 de Spark, integraciones y staging
+> 120/120/120 + 7/57/23. El build #2 con `FORZAR_FALLO=true` produjo exclusivamente el fallo
+> intencional (30 aprobadas, 1 fallo) y omitió todas las etapas posteriores, incluido deploy.
+> Falta revisión, merge del PR #6 y `bdgeo-main` exitoso para cerrar Gate 7.
 >
 > **Cambios en v41:** F7 implementada en `feature/fase7-pruebas`: 30 pruebas API, 5 de
 > ingesta, 4 pruebas puras de Spark añadidas y smoke de staging ampliado a resultados Spark
@@ -569,10 +575,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F5: PR #3 fusionado a `main` (43405ef).**
 - [x] **F6: PR #4 fusionado (89a7498); Gate 6 cerrado con `bdgeo-main` #9 sobre los datos reales.**
 - [x] **F8: benchmark medido en el PC de Santiago (32 corridas válidas, ×1 y ×10 físico); metodología aprobada en la revisión del PR #5.**
-- [ ] **F7: pruebas ampliadas y validadas localmente (30 API + 5 ingesta); falta ejecutar Spark, smoke de staging y fallo forzado en Jenkins.**
+- [ ] **F7: rama aprobada en Jenkins (`bdgeo-fase7-test` #1 normal y #2 con fallo bloqueado); falta revisar/fusionar PR #6 y validar `bdgeo-main`.**
 - [x] **F9 (parcial): ingesta completa reproducida en un segundo computador (PC de Santiago): 1.741.828 documentos en 56,3 s, mismos conteos de limpieza.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 cerrada (`bdgeo-main` #9) · F8 cerrada (PR #5) · F7 implementada y pendiente de Jenkins · F9, F10 y F11 pendientes.**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 cerrada (`bdgeo-main` #9) · F8 cerrada (PR #5) · F7 aprobada en rama y pendiente de merge/main · F9, F10 y F11 pendientes.**
 
 ---
 
@@ -672,13 +678,12 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 # 14. PRÓXIMA ACCIÓN EXACTA
 
-> Actualizado el 6-oct-2026. F2, F4, F5, F6 y F8 están cerradas; F7 está implementada en rama.
+> Actualizado el 6-oct-2026. F2, F4, F5, F6 y F8 están cerradas; F7 aprobó Jenkins en rama.
 
-1. **F7 — validar y cerrar.** Publicar `feature/fase7-pruebas`, crear un job Jenkins de rama y
-   ejecutar primero el flujo normal: debe aprobar API (30), ingesta (5), Spark (4), integración
-   y staging 120/120/120 + 7/57/23 en menos de 5 min. Luego repetir con
-   `FORZAR_FALLO=true`: debe fallar en pytest y omitir staging y despliegue. Guardar los logs,
-   aprobar el PR, fusionar y comprobar `bdgeo-main`.
+1. **F7 — cerrar merge.** Solicitar revisión de otro integrante para el PR #6, fusionarlo y
+   comprobar que el `bdgeo-main` disparado por webhook termina `SUCCESS`, despliega la nueva
+   versión y conserva `/health`. La rama ya aprobó el flujo normal (#1, 2 min 19 s) y el fallo
+   bloqueante (#2).
 2. **F9 — reproducibilidad.** Juan Guillermo clona el repositorio en su computador y levanta el
    sistema siguiendo solo el README; registrar lo que falle y corregir el README (sus commits).
 3. **F10 — documentación.** README final e informe técnico (≤ 10 páginas) en `docs/informe/`,

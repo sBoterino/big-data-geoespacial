@@ -1,4 +1,4 @@
-# F7 — validación local previa a Jenkins
+# F7 — pruebas completas y validación en Jenkins
 
 Fecha: 6-oct-2026.
 
@@ -31,8 +31,36 @@ colecciones de producción. El despliegue continúa restringido a `bdgeo-main`.
 | Parseo de `docker-compose.yml` | válido |
 | Sintaxis de la nueva suite Spark | válida |
 
-La ejecución real de las 4 pruebas Spark y de los smoke tests necesita la imagen Docker del
-proyecto. Se validará en Jenkins antes de fusionar esta rama.
+## Jenkins de la rama
+
+Job: `bdgeo-fase7-test`. Revisión probada: `640eb16`.
+
+### Build #1 — flujo normal
+
+- Resultado: `SUCCESS`.
+- Duración aproximada: 2 min 19 s (00:40:40–00:42:59), inferior a la meta de 5 minutos.
+- API: 30 aprobadas y 1 trampa omitida.
+- Ingesta: 5 aprobadas.
+- Spark puro: 4 aprobadas en 6,251 s.
+- Integraciones Dask y Spark: aprobadas.
+- Verificación Spark sobre semilla: sumas 300, hotspot `57 = 57` y ubicación a 155 m de
+  Times Square.
+- Staging: `/health` correcto; consultas 120/120/120 y resultados Spark 7/57/23.
+- `Despliegue` se omitió por ser un job de rama; producción no fue modificada.
+
+Docker Hub falló transitoriamente por DNS en los primeros intentos de construcción. El mecanismo
+de tres reintentos permitió completar el build; no fue un fallo del código ni de las pruebas.
+
+### Build #2 — fallo intencional
+
+- Parámetro: `FORZAR_FALLO=true`.
+- Resultado esperado y obtenido: `FAILURE`.
+- Pytest: 30 aprobadas y 1 fallo intencional en 0,10 s.
+- Se omitieron acceso a Kaggle, servicios, ingesta, integración, procesamiento Spark, staging y
+  despliegue debido al fallo anterior.
+- Mensaje final: la versión anterior continúa activa.
+
+Esto demuestra con el pipeline final que una prueba rota detiene la promoción de la imagen.
 
 ## Evidencia previa útil
 
@@ -41,9 +69,9 @@ con 22 pruebas API, 5 de ingesta, integraciones Dask/Spark, verificación Spark 
 staging y despliegue. Esa medición es parcial: el cierre de F7 requiere repetirla con las nuevas
 pruebas de esta rama.
 
-## Criterio para cerrar Gate 7
+## Criterio de Gate 7
 
-1. Job de la rama en `SUCCESS`, incluida la nueva suite Spark y staging 120/120/120 + 7/57/23.
-2. Mismo job con `FORZAR_FALLO=true` en `FAILURE`, sin ejecutar staging ni despliegue.
-3. Build normal inferior a 5 minutos.
-4. Merge mediante PR revisado y `bdgeo-main` en `SUCCESS`.
+1. [x] Job de la rama en `SUCCESS`, incluida la nueva suite Spark y staging 120/120/120 + 7/57/23.
+2. [x] Mismo job con `FORZAR_FALLO=true` en `FAILURE`, sin ejecutar staging ni despliegue.
+3. [x] Build normal inferior a 5 minutos.
+4. [ ] Merge mediante PR revisado y `bdgeo-main` en `SUCCESS`.
