@@ -13,6 +13,8 @@ data/
 *.sqlite
 *.zip
 !api/tests/fixtures/*.csv
+# Mediciones propias del benchmark (evidencia de F8)
+!benchmark/*.csv
 
 # --- Python ---
 __pycache__/

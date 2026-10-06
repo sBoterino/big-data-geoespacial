@@ -32,6 +32,8 @@ def main():
     p.add_argument("--celda", type=float, default=0.005)
     p.add_argument("--top", type=int, default=20)
     p.add_argument("--workers", type=int, required=True, help="workers esperados (1 o 2)")
+    p.add_argument("--replicas", type=int, default=1,
+                   help="lee el Parquet N veces para simular N veces más datos (D18)")
     args = p.parse_args()
 
     t0 = time.perf_counter()
@@ -44,7 +46,8 @@ def main():
     arranque = time.perf_counter() - t0
 
     inicio = time.perf_counter()
-    df = dd.read_parquet(args.ruta, columns=["latitude", "longitude"])
+    base = dd.read_parquet(args.ruta, columns=["latitude", "longitude"])
+    df = dd.concat([base] * args.replicas) if args.replicas > 1 else base
     df = df.assign(
         cx=np.floor(df["longitude"] / args.celda).astype("int64"),
         cy=np.floor(df["latitude"] / args.celda).astype("int64"),
@@ -59,6 +62,7 @@ def main():
         "motor": "dask",
         "workers": workers,
         "nucleos": hilos,
+        "replicas": args.replicas,
         "particiones": df.npartitions,
         "segundos": round(segundos, 3),
         "arranque_s": round(arranque, 3),

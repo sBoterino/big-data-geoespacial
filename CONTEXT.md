@@ -8,7 +8,11 @@
 > `feature/spark-agregaciones`, PR #4 aún sin fusionar): `bench_dask.py`, `bench_spark.py`,
 > `medir.ps1` (PowerShell, Windows), `resumen.py` y protocolo en `benchmark/README.md`.
 > Decisiones D16 y D17. Ambos motores probados en local sobre datos sintéticos (mismo top 1);
-> falta correr las 16 corridas sobre los datos reales.
+> falta correr las 16 corridas sobre los datos reales. **Actualización:** medidas 32 corridas
+> (×1 y ×10, D18). Dask fue 3–23 veces más rápido y usó menos memoria; la ventaja bajó de ×13 a
+> ×3 con 10 veces más datos; Spark no mejoró con un segundo worker en el mismo PC. Ambos
+> motores dieron el mismo top 1 (celda -14799_8151, n=5.336). La ingesta completa se reprodujo
+> en el PC de Santiago con los mismos conteos (evidencia parcial de F9).
 >
 > **Cambios en v37:** PR #3 fusionado a `main` (merge 43405ef, revisado y aprobado por Santiago
 > Villamizar). F6 iniciada por Santiago en `feature/spark-agregaciones`: jobs
@@ -265,6 +269,7 @@ El detalle y la justificación están en `docs/decisiones.md`, que es la fuente 
 | D15 | Verificación automática de Spark: sumas de control + cruce con `$geoWithin` | Propuesta (F6) |
 | D16 | Benchmark: conteo por celda sin sumar heridos (el Parquet no trae esa columna) | Propuesta (F8) |
 | D17 | Benchmark: particiones de shuffle de Spark = núcleos del clúster | Propuesta (F8) |
+| D18 | Benchmark: prueba de volumen leyendo el Parquet ×10 (17,4 M filas) | Propuesta (F8) |
 
 **Nota sobre D1:** si el docente pidiera expresamente usar Atlas, solo cambia la cadena de
 conexión. Pero no se espera respuesta para avanzar.
@@ -546,7 +551,8 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F4: idempotencia confirmada sobre los 1.741.828 documentos; Gate 4 cerrado.**
 - [x] **F5: PR #3 fusionado a `main` (43405ef).**
 - [ ] **F6: validada en Docker con la semilla (RESULTADO: OK); PR #4 abierto, falta revisión, merge y corrida sobre datos reales.**
-- [ ] **F8: scripts del benchmark listos en `feature/benchmark`; falta cargar los datos reales en el PC de Santiago y medir.**
+- [x] **F8: benchmark medido en el PC de Santiago (32 corridas, ×1 y ×10); resultados, gráficas y análisis en `docs/evidencias/fase8_benchmark_2026-10-05.md`. Falta PR.**
+- [x] **F9 (parcial): ingesta completa reproducida en un segundo computador (PC de Santiago): 1.741.828 documentos en 56,3 s, mismos conteos de limpieza.**
 
 **Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 en desarrollo (Santiago).**
 

@@ -240,3 +240,25 @@ cambiarse con `--shuffle`.
 **Justificación.** Dask no tiene ese sobrecosto por defecto: su `groupby` produce una sola
 partición de salida. Sin el ajuste se compararía la configuración por defecto y no los motores.
 El ajuste se declara en el informe como parte del análisis.
+
+---
+
+## D18 — Prueba de volumen del benchmark con el Parquet leído 10 veces
+**Estado:** Propuesta (5-oct-2026, F8)
+
+**Contexto.** Con las 1.741.828 filas reales, Dask calculó en 0,20–0,30 s y Spark en
+3,8–4,7 s, y Spark fue más lento con 2 workers que con 1. Con tan poco trabajo domina el
+sobrecosto de coordinación, y la medición no permite ver en qué condiciones conviene Spark.
+
+**Alternativas.** Generar y guardar un dataset sintético más grande, o leer el mismo Parquet
+varias veces dentro de cada motor.
+
+**Decisión.** Las dos implementaciones aceptan `--replicas N`, que concatena N lecturas del
+mismo Parquet (`dd.concat` en Dask, `unionAll` en Spark). Con N = 10 se procesan
+17.418.280 filas sin ocupar más disco. Se corre el mismo protocolo (A y B, 1 calentamiento y
+3 repeticiones) y el resumen separa ambos volúmenes.
+
+**Justificación.** Mantiene la misma operación, la misma fuente y los mismos recursos (D5) y
+solo cambia el volumen. El resultado es verificable: el top 1 debe ser exactamente 10 veces
+el de la prueba con ×1. La limitación —los datos repetidos no aportan diversidad— se declara
+en el informe.

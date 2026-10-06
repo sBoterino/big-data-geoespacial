@@ -7,6 +7,7 @@ el pico de memoria (suma de scheduler/master y workers) y el CPU promedio.
 Uso (desde la raíz del repositorio, en PowerShell):
   .\benchmark\medir.ps1 -Motor dask  -Config A -Repeticion 1
   .\benchmark\medir.ps1 -Motor spark -Config B -Repeticion 0   # 0 = calentamiento
+  .\benchmark\medir.ps1 -Motor dask  -Config A -Repeticion 1 -Replicas 10   # ~17 M de filas
 
 Config A = 1 worker x 2 núcleos ; Config B = 2 workers x 2 núcleos.
 Antes de cada configuración hay que dejar levantados los workers correctos (ver benchmark/README.md).
@@ -14,7 +15,8 @@ Antes de cada configuración hay que dejar levantados los workers correctos (ver
 param(
     [Parameter(Mandatory = $true)][ValidateSet("dask", "spark")][string]$Motor,
     [Parameter(Mandatory = $true)][ValidateSet("A", "B")][string]$Config,
-    [Parameter(Mandatory = $true)][int]$Repeticion
+    [Parameter(Mandatory = $true)][int]$Repeticion,
+    [int]$Replicas = 1   # >1 = lee el Parquet N veces (prueba de volumen, D18)
 )
 # "Continue": Spark y Dask escriben sus logs por stderr; con "Stop", PowerShell 5.1 los
 # trataría como errores y cortaría la corrida.
@@ -30,7 +32,7 @@ $contenedores = if ($Motor -eq "dask") {
 }
 
 # --- Muestreo de memoria y CPU en segundo plano ---------------------------------------------
-$muestras = Join-Path $env:TEMP "bdgeo_stats_$Motor$Config$Repeticion.csv"
+$muestras = Join-Path $env:TEMP "bdgeo_stats_$Motor$Config$Repeticion$Replicas.csv"
 if (Test-Path $muestras) { Remove-Item $muestras }
 # El cliente de Dask corre en un contenedor temporal (bdgeo-dask-job-run-…); se suma igual
 # que el driver de Spark, que corre dentro de spark-master.
@@ -67,12 +69,12 @@ function A-MiB([string]$texto) {
 Start-Sleep -Seconds 2   # muestras de referencia antes de empezar
 if ($Motor -eq "dask") {
     $salida = docker compose run --rm -v "${raiz}\benchmark:/opt/bench" dask-job `
-        python /opt/bench/bench_dask.py --workers $workers 2>&1
+        python /opt/bench/bench_dask.py --workers $workers --replicas $Replicas 2>&1
 } else {
     # Solo el driver necesita el script; /tmp es escribible por el usuario "spark" de la imagen.
     docker compose cp benchmark/bench_spark.py spark-master:/tmp/bench_spark.py | Out-Null
     $salida = docker compose exec -T spark-master /opt/spark/bin/spark-submit `
-        /tmp/bench_spark.py --workers $workers 2>&1
+        /tmp/bench_spark.py --workers $workers --replicas $Replicas 2>&1
 }
 Start-Sleep -Seconds 2
 Stop-Job $muestreo; Remove-Job $muestreo
@@ -110,6 +112,7 @@ $fila = [pscustomobject]@{
     motor        = $r.motor
     config       = $Config
     repeticion   = $Repeticion
+    replicas     = $Replicas
     workers      = $r.workers
     nucleos      = $r.nucleos
     segundos     = $r.segundos
@@ -127,5 +130,5 @@ $cultura = [Threading.Thread]::CurrentThread.CurrentCulture
 $fila | Export-Csv $csv -Append -NoTypeInformation -Encoding UTF8
 [Threading.Thread]::CurrentThread.CurrentCulture = $cultura
 
-Write-Host ("{0} config {1} rep {2}: {3} s de cálculo, {4} s de arranque, pico {5} MiB, CPU {6} %, {7} filas" -f `
-    $r.motor, $Config, $Repeticion, $r.segundos, $r.arranque_s, $fila.mem_pico_mib, $fila.cpu_prom_pct, $r.filas)
+Write-Host ("{0} config {1} x{8} rep {2}: {3} s de cálculo, {4} s de arranque, pico {5} MiB, CPU {6} %, {7} filas" -f `
+    $r.motor, $Config, $Repeticion, $r.segundos, $r.arranque_s, $fila.mem_pico_mib, $fila.cpu_prom_pct, $r.filas, $Replicas)

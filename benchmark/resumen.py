@@ -17,9 +17,12 @@ AQUI = Path(__file__).resolve().parent
 
 def main():
     df = pd.read_csv(AQUI / "resultados.csv", encoding="utf-8-sig")
+    if "replicas" not in df.columns:  # filas de antes de agregar la prueba de volumen
+        df["replicas"] = 1
+    df["replicas"] = df["replicas"].fillna(1).astype(int)
     medidas = df[df["repeticion"] > 0]
 
-    tabla = (medidas.groupby(["motor", "config"])
+    tabla = (medidas.groupby(["replicas", "motor", "config"])
              .agg(corridas=("segundos", "size"),
                   workers=("workers", "first"),
                   nucleos=("nucleos", "first"),
@@ -37,12 +40,12 @@ def main():
         "",
         "Corridas registradas (sin calentamiento): " + str(len(medidas)),
         "",
-        "| Motor | Config | Workers × núcleos | Cálculo (s) | Arranque (s) | Pico de memoria (MiB) | CPU prom. (%) | Filas |",
-        "|---|---|---|---:|---:|---:|---:|---:|",
+        "| Datos | Motor | Config | Workers × núcleos | Cálculo (s) | Arranque (s) | Pico de memoria (MiB) | CPU prom. (%) | Filas |",
+        "|---|---|---|---|---:|---:|---:|---:|---:|",
     ]
     for _, f in tabla.iterrows():
         lineas.append(
-            f"| {f.motor} | {f.config} | {f.workers} × {int(f.nucleos) // max(int(f.workers), 1)} "
+            f"| ×{f.replicas} | {f.motor} | {f.config} | {f.workers} × {int(f.nucleos) // max(int(f.workers), 1)} "
             f"| {f.calculo_s:.2f} ± {0 if pd.isna(f.calculo_de) else f.calculo_de:.2f} "
             f"| {f.arranque_s:.2f} "
             f"| {f.mem_pico_mib:.0f} ± {0 if pd.isna(f.mem_de) else f.mem_de:.0f} "
@@ -50,16 +53,23 @@ def main():
         )
 
     lineas += ["", "## Escalamiento de A (1 worker) a B (2 workers)", ""]
-    for motor, g in tabla.groupby("motor"):
+    for (rep, motor), g in tabla.groupby(["replicas", "motor"]):
         t = dict(zip(g["config"], g["calculo_s"]))
         if "A" in t and "B" in t:
-            lineas.append(f"- {motor}: {t['A']:.2f} s → {t['B']:.2f} s, aceleración ×{t['A'] / t['B']:.2f}"
-                          " (×2,00 sería escalamiento lineal)")
+            lineas.append(f"- datos ×{rep}, {motor}: {t['A']:.2f} s → {t['B']:.2f} s, aceleración "
+                          f"×{t['A'] / t['B']:.2f} (×2,00 sería escalamiento lineal)")
+
+    lineas += ["", "## Dask frente a Spark", ""]
+    for (rep, config), g in tabla.groupby(["replicas", "config"]):
+        t = dict(zip(g["motor"], g["calculo_s"]))
+        if "dask" in t and "spark" in t:
+            lineas.append(f"- datos ×{rep}, config {config}: Spark tarda ×{t['spark'] / t['dask']:.1f} "
+                          "lo que tarda Dask")
 
     lineas += ["", "## Consistencia de resultados", ""]
-    tops = medidas.groupby("motor")[["top1", "top1_n"]].agg(lambda s: sorted(set(s.astype(str))))
-    for motor, f in tops.iterrows():
-        lineas.append(f"- {motor}: top 1 = {', '.join(f.top1)} con n = {', '.join(f.top1_n)}")
+    tops = medidas.groupby(["replicas", "motor"])[["top1", "top1_n"]].agg(lambda s: sorted(set(s.astype(str))))
+    for (rep, motor), f in tops.iterrows():
+        lineas.append(f"- datos ×{rep}, {motor}: top 1 = {', '.join(f.top1)} con n = {', '.join(f.top1_n)}")
 
     (AQUI / "resumen.md").write_text("\n".join(lineas) + "\n", encoding="utf-8")
     print("\n".join(lineas))
