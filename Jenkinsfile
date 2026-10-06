@@ -84,6 +84,7 @@ pipeline {
             steps {
                 sh 'docker run --rm -e FORZAR_FALLO=${FORZAR_FALLO} bdgeo-api-test:${API_TAG}'
                 sh 'docker run --rm bdgeo-ingest-test:${API_TAG}'
+                sh 'docker run --rm -e SPARK_LOCAL_IP=127.0.0.1 --entrypoint /opt/spark/bin/spark-submit bdgeo-spark:latest --master local[2] /opt/tests/test_agregaciones.py'
             }
         }
 
@@ -173,14 +174,17 @@ pipeline {
         }
 
         stage('Pruebas contra la API (staging)') {
-            when { expression { env.JOB_NAME == 'bdgeo-main' } }
+            // También se ejecuta en ramas: usa eventos_semilla y resultados spark_semilla_*,
+            // por lo que valida la imagen candidata sin leer ni modificar producción.
             steps {
                 sh '''
                     . jenkins/ci-env.sh
                      docker run -d --name ${STAGING} --network bdgeo-net \
                           -e MONGO_ROOT_USER -e MONGO_ROOT_PASSWORD \
                          -e MONGO_HOST=mongodb -e MONGO_DB=geo \
-                         -e MONGO_COLLECTION=eventos_semilla -e APP_VERSION=${API_TAG}-staging \
+                         -e MONGO_COLLECTION=eventos_semilla \
+                         -e SPARK_COLLECTION_PREFIX=spark_semilla_ \
+                         -e APP_VERSION=${API_TAG}-staging \
                           bdgeo-api:${API_TAG}
                      SMOKE_SEMILLA=true bash scripts/smoke_api.sh http://${STAGING}:5000
                 '''

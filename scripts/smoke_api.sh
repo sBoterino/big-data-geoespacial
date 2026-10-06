@@ -37,11 +37,37 @@ if [ "${SMOKE_SEMILLA:-false}" = "true" ]; then
   grep -q '"total_devuelto":1' /tmp/geonear.json || { echo "[smoke] FALLO: /geonear grupos != 1"; exit 1; }
   grep -q '"n":120' /tmp/geonear.json || { echo "[smoke] FALLO: /geonear n != 120"; exit 1; }
 
+  curl -fsS "${BASE}/spark-results" > /tmp/spark_colecciones.json
+  esperado='"colecciones":["grilla","hora_borough","hotspots","meta","por_dia_semana","por_hora","por_mes"]'
+  grep -Fq "$esperado" /tmp/spark_colecciones.json || {
+    echo "[smoke] FALLO: /spark-results no listó las 7 colecciones de la semilla"
+    cat /tmp/spark_colecciones.json
+    exit 1
+  }
+
+  curl -fsS "${BASE}/spark-results/hotspots?limit=1&orden=ranking&desc=false" \
+    > /tmp/spark_hotspots.json
+  grep -q '"total_devuelto":1' /tmp/spark_hotspots.json || {
+    echo "[smoke] FALLO: /spark-results/hotspots debía devolver un documento"; exit 1;
+  }
+  grep -q '"ranking":1' /tmp/spark_hotspots.json || {
+    echo "[smoke] FALLO: no devolvió el hotspot #1"; exit 1;
+  }
+  grep -q '"n":57' /tmp/spark_hotspots.json || {
+    echo "[smoke] FALLO: hotspot #1 != 57"; exit 1;
+  }
+
+  curl -fsS "${BASE}/spark-results/por_hora?limit=100&orden=hora&desc=false" \
+    > /tmp/spark_por_hora.json
+  grep -q '"total_devuelto":23' /tmp/spark_por_hora.json || {
+    echo "[smoke] FALLO: /spark-results/por_hora debía devolver 23 horas"; exit 1;
+  }
+
   poligono_abierto='{"type":"Polygon","coordinates":[[[-74,40],[-73,40],[-73,41],[-74,41]]]}'
   codigo=$(curl -s -o /tmp/within_invalido.json -w '%{http_code}' -X POST "${BASE}/within" \
     -H 'Content-Type: application/json' --data "$poligono_abierto")
   [ "$codigo" = "400" ] || { echo "[smoke] FALLO: polígono abierto debía responder 400"; exit 1; }
-  echo "[smoke] consultas geoespaciales sobre semilla: 120/120/120 OK"
+  echo "[smoke] consultas sobre semilla: 120/120/120 y resultados Spark 7/57/23 OK"
 fi
 
 echo "[smoke] OK"

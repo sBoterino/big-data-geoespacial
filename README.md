@@ -7,7 +7,7 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
-> Estado: **F2, F4, F5, F6 (Gate 6, `bdgeo-main` #9) y F8 (benchmark) cerradas; en curso: pruebas finales (F7), reproducibilidad (F9) e informe (F10)**.
+> Estado: **F2, F4, F5, F6 (Gate 6, `bdgeo-main` #9) y F8 (benchmark) cerradas; F7 está implementada y pendiente de su ejecución final en Jenkins; continúan F9 y F10**.
 > Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset
@@ -56,6 +56,20 @@ Probar las reglas de limpieza dentro de la imagen de ingesta:
 docker build --target test -t bdgeo-ingest-test:dev ingest
 docker run --rm bdgeo-ingest-test:dev
 ```
+
+Probar la API y las transformaciones puras de Spark:
+
+```bash
+docker build --target test -t bdgeo-api-test:dev api
+docker run --rm bdgeo-api-test:dev
+docker compose build spark-master
+docker run --rm -e SPARK_LOCAL_IP=127.0.0.1 \
+  --entrypoint /opt/spark/bin/spark-submit bdgeo-spark:latest \
+  --master 'local[2]' /opt/tests/test_agregaciones.py
+```
+
+La etapa de staging de Jenkins usa los datos y resultados Spark de semilla, con conteos
+conocidos, tanto en ramas como en `main`. Solo `bdgeo-main` puede desplegar en producción.
 
 Probar el perfilador con datos sintéticos (requiere `pandas`, pero no Kaggle ni credenciales):
 

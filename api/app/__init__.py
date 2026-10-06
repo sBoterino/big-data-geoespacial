@@ -21,6 +21,7 @@ def create_app(db=None):
         db = client[config.MONGO_DB]
 
     app.config["DB"] = db
+    app.config["SPARK_COLLECTION_PREFIX"] = config.SPARK_COLLECTION_PREFIX
     app.register_blueprint(consultas_bp)
 
     @app.get("/health")

@@ -21,4 +21,5 @@ def mongo_uri() -> str:
 
 MONGO_DB = os.getenv("MONGO_DB", "geo")
 MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "eventos")
+SPARK_COLLECTION_PREFIX = os.getenv("SPARK_COLLECTION_PREFIX", "spark_")
 APP_VERSION = os.getenv("APP_VERSION", "dev")

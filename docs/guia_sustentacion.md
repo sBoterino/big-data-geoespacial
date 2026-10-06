@@ -1,6 +1,6 @@
 # Guía viva de sustentación
 
-Última actualización: 4-oct-2026
+Última actualización: 6-oct-2026
 
 Fuente principal: sección 6 del enunciado del docente.
 
@@ -46,7 +46,9 @@ seguir el despliegue y explicar por qué está construido así.
 | GeoJSON e índice 2dsphere | **Validado con carga completa** | Auditoría posterior a `bdgeo-main` #6 | Documento real `Point [-74.00231, 40.59662]`; índices `_id_`, `fecha_1` y `location_2dsphere` |
 | Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Endpoints y Spark ya existen; falta ensayar el cambio con rama, PR, merge y Jenkins (simulacro del 8-oct) |
 | Consulta con otro polígono | **Validada con semilla y datos reales** | `fase5_semilla_2026-10-04.md`, `fase5_datos_reales_2026-10-04.md` | `/within` recibe cualquier `Polygon` GeoJSON válido; cambiar el polígono no exige cambiar código |
-| Pruebas de consultas API | **Unitarias e integración real aprobadas** | Evidencias F5 en `docs/evidencias/` | 22 pruebas, conteos semilla 120/120/120 y consultas sobre 1.741.828 documentos; falta Jenkins |
+| Pruebas de consultas API | **F7 ampliada; Jenkins pendiente** | `fase7_validacion_local_2026-10-06.md` | 30 pruebas API y 5 de ingesta aprobadas localmente; staging verificará 120/120/120 y Spark 7/57/23 antes del merge |
+| Pruebas puras de Spark | **Implementadas; Jenkins pendiente** | `spark/tests/test_agregaciones.py` | Grilla, GeoJSON `[lon, lat]`, sumas, ranking determinista, agregación temporal y Haversine sin depender de MongoDB |
+| Staging seguro en ramas | **Implementado; Jenkins pendiente** | `Jenkinsfile` | La rama prueba `eventos_semilla` y `spark_semilla_*`; solo `bdgeo-main` conserva permiso de despliegue |
 | Rendimiento de consultas | **Medido** | `fase5_datos_reales_2026-10-04.md` | Promedios calientes: `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms; agrupado 1.786,176 ms |
 | Dominio integral de los tres miembros | **Pendiente de ensayo** | — | Cada integrante debe practicar preguntas y hacer cambios fuera de su componente principal |
 
