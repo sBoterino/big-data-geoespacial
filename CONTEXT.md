@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v39 (6-oct-2026)
+## Contexto maestro transferible entre IAs — v40 (6-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v40:** revisión final del PR #5: checklist del proyecto (sección 12), próxima
+> acción (sección 14), D13–D18 aprobadas, README y guía de sustentación con los resultados de
+> F6/F8.
 >
 > **Cambios en v39:** PR #4 fusionado (89a7498) y **Gate 6 cerrado con `bdgeo-main` #9**
 > (agregaciones Spark sobre los datos reales, según la ejecución en el Jenkins de Sebastián).
@@ -271,12 +275,12 @@ El detalle y la justificación están en `docs/decisiones.md`, que es la fuente 
 | D10 | Deploy = imagen `bdgeo-api:<BUILD>` → staging + smoke → promoción a `api` → verificación | Aprobada |
 | D11 | Datos semilla deterministas (300 puntos, conteos conocidos) para las pruebas | Aprobada |
 | D12 | Validador `$jsonSchema` de GeoJSON en MongoDB | Aprobada |
-| D13 | Grilla de 0,005° (≈ 500 m) como unidad espacial de Spark | Propuesta (F6) |
-| D14 | Proyección `$project` en MongoDB antes de leer con Spark | Propuesta (F6) |
-| D15 | Verificación automática de Spark: sumas de control + cruce con `$geoWithin` | Propuesta (F6) |
-| D16 | Benchmark: conteo por celda sin sumar heridos (el Parquet no trae esa columna) | Propuesta (F8) |
-| D17 | Benchmark: particiones de shuffle de Spark = núcleos del clúster | Propuesta (F8) |
-| D18 | Benchmark: prueba de volumen con un Parquet físico ×10 (17,4 M filas) | Propuesta (F8) |
+| D13 | Grilla de 0,005° (≈ 500 m) como unidad espacial de Spark | Aprobada (Gate 6) |
+| D14 | Proyección `$project` en MongoDB antes de leer con Spark | Aprobada (Gate 6) |
+| D15 | Verificación automática de Spark: sumas de control + cruce con `$geoWithin` | Aprobada (Gate 6) |
+| D16 | Benchmark: conteo por celda sin sumar heridos (el Parquet no trae esa columna) | Aprobada (PR #5) |
+| D17 | Benchmark: particiones de shuffle de Spark = núcleos del clúster | Aprobada (PR #5) |
+| D18 | Benchmark: prueba de volumen con un Parquet físico ×10 (17,4 M filas) | Aprobada (PR #5) |
 
 **Nota sobre D1:** si el docente pidiera expresamente usar Atlas, solo cambia la cadena de
 conexión. Pero no se espera respuesta para avanzar.
@@ -558,10 +562,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F4: idempotencia confirmada sobre los 1.741.828 documentos; Gate 4 cerrado.**
 - [x] **F5: PR #3 fusionado a `main` (43405ef).**
 - [x] **F6: PR #4 fusionado (89a7498); Gate 6 cerrado con `bdgeo-main` #9 sobre los datos reales.**
-- [ ] **F8: benchmark medido en el PC de Santiago (32 corridas válidas, ×1 y ×10 físico); PR #5 corregido según la revisión, pendiente de aprobación y merge.**
+- [x] **F8: benchmark medido en el PC de Santiago (32 corridas válidas, ×1 y ×10 físico); metodología aprobada en la revisión del PR #5.**
 - [x] **F9 (parcial): ingesta completa reproducida en un segundo computador (PC de Santiago): 1.741.828 documentos en 56,3 s, mismos conteos de limpieza.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 cerrada (`bdgeo-main` #9) · F8 en revisión (PR #5).**
+**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2 aprobada · F4 aprobada y Gate 4 cerrado · F5 fusionada · F6 cerrada (`bdgeo-main` #9) · F8 cerrada (PR #5) · F7, F9, F10 y F11 pendientes.**
 
 ---
 
@@ -627,16 +631,16 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 - [x] Docker Compose levanta MongoDB, Spark, Dask, Flask, Jenkins y smee desde el mismo archivo.
 - [x] El acceso a Kaggle es automático en el pipeline, con credencial de Jenkins y sin secretos en GitHub.
-- [ ] Dask limpia y carga por lotes; la limpieza está justificada con conteos.
-- [ ] MongoDB tiene GeoJSON válido `[lon, lat]` e índice 2dsphere.
-- [ ] Spark agrega vía el conector y guarda los resultados en colecciones nuevas.
-- [ ] `$near`, `$geoWithin` y `$geoNear` funcionan con parámetros.
-- [ ] Flask expone los 3 endpoints mínimos.
+- [x] Dask limpia y carga por lotes; la limpieza está justificada con conteos (Gate 4, `bdgeo-main` #6/#7).
+- [x] MongoDB tiene GeoJSON válido `[lon, lat]` e índice 2dsphere (auditoría de Gate 4).
+- [x] Spark agrega vía el conector y guarda los resultados en colecciones nuevas (Gate 6, `bdgeo-main` #9).
+- [x] `$near`, `$geoWithin` y `$geoNear` funcionan con parámetros (F5, PR #3).
+- [x] Flask expone los 3 endpoints mínimos (`/near`, `/within`, `/spark-results`, más `/geonear`).
 - [x] Hay webhook de GitHub hacia Jenkins, y un test fallido bloquea el deploy (con evidencia).
-- [ ] La comparación Dask vs Spark tiene mediciones propias.
+- [x] La comparación Dask vs Spark tiene mediciones propias (F8, PR #5: 32 corridas, ×1 y ×10 físico).
 - [x] Hay README, `docker-compose.yml` y `Jenkinsfile` en el repositorio.
 - [ ] El informe tiene 10 páginas o menos.
-- [ ] El historial de commits refleja a todos los integrantes.
+- [ ] El historial de commits refleja a todos los integrantes (Sebastián y Santiago sí; falta Juan Guillermo).
 - [ ] Todos pueden hacer un cambio en vivo y explicar el sistema completo.
 
 ---
@@ -661,19 +665,20 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 # 14. PRÓXIMA ACCIÓN EXACTA
 
-> **El plan operativo día por día está en `docs/plan_paso_a_paso.md`.** Seguirlo en orden; las especificaciones de F4–F8 de ese archivo son las que se entregan a la IA para generar el código.
+> Actualizado el 6-oct-2026. F2, F4, F5 y F6 están cerradas; F8 queda cerrada al fusionar el PR #5.
 
-1. Enviar al docente el texto ya completado en `docs/registro_dataset_docente.md`. No esperar
-   respuesta para continuar; D7 sigue como verificada pero no aprobada hasta el registro.
-2. Asignar los cuatro componentes de la sección 10 entre los tres integrantes y definir revisores.
-   Cada integrante debe configurar su propio `user.name` y `user.email` antes de contribuir.
-3. Invitar a los otros dos integrantes en GitHub. No activar el ruleset de `main`; exigir ramas,
-   pull request y una revisión como norma del equipo y conservar la evidencia de los PR.
-4. Arrancar **en paralelo** las siguientes fases, cada una en su rama y con PR:
-   - F4: ingesta Dask. Requiere el JSON de la verificación del dataset.
-   - F5: consultas y API sobre `eventos_semilla`.
-   - F6: agregaciones Spark, partiendo de `check_conexion.py`.
-5. Cada error: copiar el mensaje exacto y la salida de `docker compose ps` o `docker compose logs <servicio>`.
+1. **F7 — cerrar pruebas.** Agregar `/spark-results` a `scripts/smoke_api.sh` (contra
+   `spark_semilla_*` o los resultados reales) y pruebas unitarias de las funciones puras de
+   Spark (`agregar_por_celda`, `seleccionar_hotspots`, `agregar`). En el Jenkins de Sebastián:
+   repetir `FORZAR_FALLO=true` con el pipeline final y medir el build normal (meta < 5 min).
+2. **F9 — reproducibilidad.** Juan Guillermo clona el repositorio en su computador y levanta el
+   sistema siguiendo solo el README; registrar lo que falle y corregir el README (sus commits).
+3. **F10 — documentación.** README final e informe técnico (≤ 10 páginas) en `docs/informe/`,
+   con arquitectura, decisiones D1–D18, consultas, Spark y benchmark (evidencias F4–F8).
+4. **F0 — confirmar** que el registro del dataset (`docs/registro_dataset_docente.md`) se envió
+   al docente.
+5. **F11 — simulacro (8-oct):** congelar `main`, cambio en vivo por integrante y ronda de
+   preguntas cruzadas con `docs/guia_sustentacion.md`.
 
 ---
 

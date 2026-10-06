@@ -38,9 +38,13 @@ seguir el despliegue y explicar por qué está construido así.
 | Fallo distribuido bloqueado antes de desplegar | **Demostrado** | `bdgeo-ingesta-test` #1 | Un módulo no importable en el scheduler detuvo el pipeline; integración y despliegue quedaron omitidos |
 | Compatibilidad entre particiones y reducciones | **Corregida y validada** | `bdgeo-ingesta-test` #3 | Cinco pruebas y la muestra real confirmaron el conteo explícito de longitudes por partición |
 | Tolerancia a fallos transitorios de descarga | **Mitigada y validada** | Builds #4/#6/#7, `Jenkinsfile`, `spark/Dockerfile` | Tres intentos con espera; el build #7 creó la capa cacheable de JAR y terminó correctamente |
-| Spark conectado a MongoDB | **Listo como infraestructura** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
+| Spark conectado a MongoDB | **Listo** | `spark/jobs/check_conexion.py` | Master, worker, conector MongoDB, lectura de 300 documentos y conteos 120/80/100 |
+| Agregaciones Spark (grilla, hotspots, hora, día, mes, hora×borough) | **Gate 6 cerrado** | PR #4, `bdgeo-main` #9, `fase6_logica_local_2026-10-04.md` | Siete colecciones `spark_*`; con la semilla, hotspot #1 n=57 en Spark y 57 con `$geoWithin` |
+| Resultados de Spark verificables | **Automatizado** | `verificar_resultados.py`, etapa "Procesamiento Spark" | Sumas de control y cruce con MongoDB en cada build; si no cuadra, el pipeline se detiene |
+| Benchmark Dask vs Spark | **Cerrado (F8)** | PR #5, `fase8_benchmark_2026-10-05.md` | 32 corridas propias, ×1 y ×10 físico, mismo top 1 en ambos motores, gráficas y limitaciones |
+| Corrección metodológica del benchmark | **Documentada** | D18, `resultados_descartados.csv` | El ×10 lógico estaba sesgado (Dask leía una vez y Spark diez); se repitió con un Parquet físico |
 | GeoJSON e índice 2dsphere | **Validado con carga completa** | Auditoría posterior a `bdgeo-main` #6 | Documento real `Point [-74.00231, 40.59662]`; índices `_id_`, `fecha_1` y `location_2dsphere` |
-| Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Todavía falta implementar los endpoints reales y ensayar un cambio de aplicación con rama, PR y merge |
+| Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Endpoints y Spark ya existen; falta ensayar el cambio con rama, PR, merge y Jenkins (simulacro del 8-oct) |
 | Consulta con otro polígono | **Validada con semilla y datos reales** | `fase5_semilla_2026-10-04.md`, `fase5_datos_reales_2026-10-04.md` | `/within` recibe cualquier `Polygon` GeoJSON válido; cambiar el polígono no exige cambiar código |
 | Pruebas de consultas API | **Unitarias e integración real aprobadas** | Evidencias F5 en `docs/evidencias/` | 22 pruebas, conteos semilla 120/120/120 y consultas sobre 1.741.828 documentos; falta Jenkins |
 | Rendimiento de consultas | **Medido** | `fase5_datos_reales_2026-10-04.md` | Promedios calientes: `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms; agrupado 1.786,176 ms |
@@ -146,13 +150,15 @@ lo demostró: no se ejecutó `Despliegue` y la API siguió en la versión 2.
 
 | Pregunta probable | Qué falta obtener |
 |---|---|
-| ¿Por qué Dask para ingesta y Spark para agregaciones? | Añadir experiencia y mediciones reales de F4, F6 y F8 |
+| ¿Por qué Dask para ingesta y Spark para agregaciones? | **Respondida:** Dask fue más rápido y sin arranque para la limpieza en pandas; Spark aporta el conector de MongoDB, el optimizador y el clúster para las agregaciones, y su desventaja bajó de ×12,7 a ×1,9 con 10 veces más datos (F8) |
 | ¿Cuántas particiones Dask usaron? | 6 particiones para 1.972.121 filas; dos workers conectados |
 | ¿Cuántos registros eliminó cada regla de limpieza? | R1=226.028, R2=4.115, R3=106, R4=44, R5=0, R6=0 |
 | Diferencia práctica entre `$near`, `$geoWithin` y `$geoNear` | Implementar y medir F5 |
-| ¿Cómo verificaron los resultados de Spark? | Sumas de control y cruce de hotspots con MongoDB en F6 |
-| ¿Cuándo conviene Dask o Spark? | Tiempos y memoria propios del benchmark F8 |
-| ¿Qué harían con diez veces más datos? | Respuesta final basada en los cuellos de botella observados |
+| ¿Cómo verificaron los resultados de Spark? | **Respondida:** grilla, hora, día y mes suman el total de documentos; el hotspot #1 se recuenta con `$geoWithin` (semilla: 57 = 57) |
+| ¿Cuándo conviene Dask o Spark? | **Respondida:** con ~1,7 M de filas en un PC, Dask (0,30 s vs 3,80 s); Spark crece más despacio con el volumen (×1,2 frente a ×7,9 al multiplicar por 10). Que lo supere con más datos es hipótesis no medida |
+| ¿Qué harían con diez veces más datos? | **Medido parcialmente:** con un Parquet físico ×10, Dask 2,36 s y Spark 4,51 s (1 worker); Spark no ganó con un 2.º worker en el mismo PC. En un clúster real se probaría Spark con varias máquinas |
+| ¿Por qué Spark fue más lento con 2 workers? | Ambos workers comparten el mismo computador (sin CPU física extra) y el shuffle del `groupBy` serializa datos entre JVM |
+| ¿Por qué descartaron mediciones? | Workers con memoria residual de la ingesta y un ×10 lógico sesgado; todo queda en `resultados_descartados.csv` con el motivo (D18) |
 
 ## 6. Cambios en vivo que deben ensayarse
 
