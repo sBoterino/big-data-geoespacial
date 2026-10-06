@@ -15,5 +15,6 @@ RUN python3 -c "from urllib.request import urlretrieve; files=[('org/mongodb/spa
     && chmod 0644 /opt/spark/jars/*.jar
 
 COPY --chmod=755 jobs /opt/jobs
+COPY --chmod=755 tests /opt/tests
 ENV PATH="/opt/spark/bin:${PATH}"
 WORKDIR /opt/jobs

@@ -50,6 +50,11 @@ def _coleccion_eventos():
     return current_app.config["DB"][config.MONGO_COLLECTION]
 
 
+def _coleccion_spark(nombre: str) -> str:
+    """Nombre físico de una salida Spark; staging usa el prefijo de la semilla."""
+    return f"{current_app.config['SPARK_COLLECTION_PREFIX']}{nombre}"
+
+
 def _respuesta(resultados: list[dict[str, Any]], parametros: dict[str, Any], inicio: float):
     return jsonify(
         total_devuelto=len(resultados),
@@ -97,7 +102,7 @@ def spark_colecciones():
     inicio = perf_counter()
     existentes = set(current_app.config["DB"].list_collection_names())
     colecciones = sorted(
-        nombre for nombre in COLECCIONES_SPARK if f"spark_{nombre}" in existentes
+        nombre for nombre in COLECCIONES_SPARK if _coleccion_spark(nombre) in existentes
     )
     return jsonify(colecciones=colecciones, tiempo_ms=round((perf_counter() - inicio) * 1000, 3))
 
@@ -110,7 +115,7 @@ def spark_resultados(nombre: str):
     limit = entero(request.args.get("limit", 100), "limit", minimo=1, maximo=1000)
     orden = campo_orden(request.args.get("orden", "n"))
     desc = booleano(request.args.get("desc", "true"), "desc")
-    cursor = current_app.config["DB"][f"spark_{nombre}"].find({}).sort(
+    cursor = current_app.config["DB"][_coleccion_spark(nombre)].find({}).sort(
         orden, -1 if desc else 1
     ).limit(limit)
     resultados = list(cursor)

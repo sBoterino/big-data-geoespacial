@@ -19,6 +19,8 @@ def test_punto_valido_aplica_limit_por_defecto():
         {"lat": "0", "lon": "181", "radio": "10"},
         {"lat": "0", "lon": "0", "radio": "0"},
         {"lat": "0", "lon": "0", "radio": "50001"},
+        {"lat": "0", "lon": "0", "radio": "10", "limit": "0"},
+        {"lat": "0", "lon": "0", "radio": "10", "limit": "1001"},
         {"lat": "0", "lon": "0", "radio": "10", "limit": "1.5"},
     ],
 )
@@ -43,6 +45,20 @@ def test_poligono_rechaza_anillo_sin_cerrar():
                 "coordinates": [[[-74, 40], [-73, 40], [-73, 41], [-74, 41]]],
             }
         )
+
+
+@pytest.mark.parametrize(
+    "geometria",
+    [
+        None,
+        {"type": "Point", "coordinates": [-73.9, 40.7]},
+        {"type": "Polygon", "coordinates": []},
+        {"type": "Polygon", "coordinates": [[[-181, 40], [-73, 40], [-73, 41], [-181, 40]]]},
+    ],
+)
+def test_poligono_rechaza_estructuras_y_coordenadas_invalidas(geometria):
+    with pytest.raises(ErrorValidacion):
+        poligono(geometria)
 
 
 def test_booleano_exige_valor_reconocible():

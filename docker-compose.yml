@@ -176,6 +176,7 @@ services:
     environment:
       <<: *mongo-env
       MONGO_COLLECTION: ${MONGO_COLLECTION:-eventos}
+      SPARK_COLLECTION_PREFIX: ${SPARK_COLLECTION_PREFIX:-spark_}
       APP_VERSION: ${API_TAG:-latest}
     ports:
       - "${API_PORT:-5000}:5000"
