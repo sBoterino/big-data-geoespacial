@@ -1,8 +1,13 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v43 (6-oct-2026)
+## Contexto maestro transferible entre IAs — v44 (7-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v44:** preparada `docs/guia_fase9_reproducibilidad.md` y corregido el arranque
+> Windows del README para la prueba en el computador de Juan Guillermo. La guía exige clon
+> limpio, secretos propios, carga/idempotencia, Spark real, API, tiempo y un PR firmado por Juan;
+> la ejecución sigue pendiente.
 >
 > **Cambios en v43:** PR #6 fusionado (`71fd7fb`) y Gate 7 cerrado con `bdgeo-main` #11:
 > `SUCCESS` en 1 min 52 s, 30 pruebas API, 5 de ingesta, 4 de Spark, integraciones, staging
@@ -685,8 +690,10 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 > Actualizado el 6-oct-2026. F2, F4, F5, F6, F7 y F8 están cerradas.
 
-1. **F9 — reproducibilidad.** Juan Guillermo clona el repositorio en su computador y levanta el
-   sistema siguiendo solo el README; registrar lo que falle y corregir el README (sus commits).
+1. **F9 — reproducibilidad.** Fusionar la guía F9; Juan Guillermo clona `main` en su computador
+   y sigue el README sin ayuda verbal. Debe guardar tiempo, checks, carga, idempotencia, Spark y
+   problemas en `fase9_reproducibilidad_juan_2026-10-07.md`, corregir el README si hace falta y
+   abrir un PR con su propia identidad de GitHub.
 2. **F10 — documentación.** README final e informe técnico (≤ 10 páginas) en `docs/informe/`,
    con arquitectura, decisiones D1–D18, consultas, Spark y benchmark (evidencias F4–F8).
 3. **F0 — confirmar** que el registro del dataset (`docs/registro_dataset_docente.md`) se envió

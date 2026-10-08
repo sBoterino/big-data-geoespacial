@@ -8,7 +8,7 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
 > Estado: **F2, F4, F5, F6, F7 (`bdgeo-main` #11, API v11) y F8 cerradas; continúan la reproducibilidad F9, el informe F10 y el simulacro F11**.
-> Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
+> Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · reproducibilidad F9 en [`docs/guia_fase9_reproducibilidad.md`](docs/guia_fase9_reproducibilidad.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset
 
@@ -28,12 +28,18 @@ de rango y 1.741.872 registros geográficamente válidos. La evidencia está en
 
 ## Levantar el sistema desde cero
 
-```bash
-git clone <url-del-repo>
-cd <repo>
-cp .env.example .env              # completar MONGO_ROOT_PASSWORD y las credenciales de Kaggle
-docker compose up -d --build      # MongoDB, Spark (master + worker), Dask (scheduler + 2 workers), API
+```powershell
+git clone https://github.com/sBoterino/big-data-geoespacial.git
+Set-Location .\big-data-geoespacial
+Copy-Item .env.example .env
+notepad .env                       # cambiar contraseña Mongo y añadir el token de Kaggle
+docker compose config --quiet
+docker compose up -d --build       # MongoDB, Spark, Dask y API
+docker compose ps
 ```
+
+En Windows, los comandos completos desde un equipo limpio, la carga de datos, las pruebas y el
+formato de evidencia están en la [guía F9](docs/guia_fase9_reproducibilidad.md).
 
 | Servicio | URL |
 |---|---|
