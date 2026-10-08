@@ -1,6 +1,6 @@
 # Guía viva de sustentación
 
-Última actualización: 6-oct-2026
+Última actualización: 7-oct-2026
 
 Fuente principal: sección 6 del enunciado del docente.
 
@@ -50,6 +50,7 @@ seguir el despliegue y explicar por qué está construido así.
 | Pruebas puras de Spark | **Aprobadas en Jenkins** | `bdgeo-fase7-test` #1, `spark/tests/test_agregaciones.py` | 4 pruebas de grilla, GeoJSON `[lon, lat]`, sumas, ranking, temporal y Haversine en 6,251 s |
 | Staging seguro en ramas | **Demostrado** | `bdgeo-fase7-test` #1 | Usa `eventos_semilla` y `spark_semilla_*`; staging pasó y `Despliegue` fue omitido, sin cambiar producción |
 | Bloqueo con pipeline final | **Demostrado** | `bdgeo-fase7-test` #2 | `FORZAR_FALLO=true`: 30 aprobadas, 1 fallo intencional; Kaggle, servicios, integración, Spark, staging y deploy omitidos |
+| Reproducibilidad en otro PC | **Guía lista; ejecución de Juan pendiente** | `docs/guia_fase9_reproducibilidad.md` | Clon limpio, secretos propios, carga/idempotencia, Spark, API, tiempo y PR firmado por Juan |
 | Rendimiento de consultas | **Medido** | `fase5_datos_reales_2026-10-04.md` | Promedios calientes: `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms; agrupado 1.786,176 ms |
 | Dominio integral de los tres miembros | **Pendiente de ensayo** | — | Cada integrante debe practicar preguntas y hacer cambios fuera de su componente principal |
 
