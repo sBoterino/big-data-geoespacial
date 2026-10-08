@@ -218,7 +218,6 @@ pipeline {
     }
 
     success {
-        // Conserva solo las últimas 5 versiones de la API para no llenar el disco
         script {
             node {
                 sh '''
@@ -238,4 +237,5 @@ pipeline {
     failure {
         echo "FALLO: el pipeline se detuvo y NO se desplegó la versión ${env.BUILD_NUMBER}. La versión anterior sigue activa."
     }
+}
 }
