@@ -205,29 +205,37 @@ pipeline {
     }
 
     post {
-        always {
-            sh '''
-                docker rm -f ${STAGING} >/dev/null 2>&1 || true
-                docker image rm bdgeo-api-test:${API_TAG} >/dev/null 2>&1 || true
-                docker image rm bdgeo-ingest-test:${API_TAG} >/dev/null 2>&1 || true
-            '''
-        }
-        success {
-            // Conserva solo las últimas 5 versiones de la API para no llenar el disco
-            sh '''
-                docker images bdgeo-api --format '{{.Tag}}' | grep -E '^[0-9]+$' | sort -n | head -n -5 \
-                  | xargs -r -I{} docker image rm bdgeo-api:{} >/dev/null 2>&1 || true
-            '''
-            script {
-                if (env.JOB_NAME == 'bdgeo-main') {
-                    echo "OK: build ${env.BUILD_NUMBER} desplegado."
-                } else {
-                    echo "OK: validación ${env.JOB_NAME} #${env.BUILD_NUMBER} aprobada; producción no fue modificada."
-                }
+    always {
+        script {
+            node {
+                sh '''
+                    docker rm -f ${STAGING} >/dev/null 2>&1 || true
+                    docker image rm bdgeo-api-test:${API_TAG} >/dev/null 2>&1 || true
+                    docker image rm bdgeo-ingest-test:${API_TAG} >/dev/null 2>&1 || true
+                '''
             }
         }
-        failure {
-            echo "FALLO: el pipeline se detuvo y NO se desplegó la versión ${env.BUILD_NUMBER}. La versión anterior sigue activa."
+    }
+
+    success {
+        // Conserva solo las últimas 5 versiones de la API para no llenar el disco
+        script {
+            node {
+                sh '''
+                    docker images bdgeo-api --format '{{.Tag}}' | grep -E '^[0-9]+$' | sort -n | head -n -5 \
+                      | xargs -r -I{} docker image rm bdgeo-api:{} >/dev/null 2>&1 || true
+                '''
+            }
+
+            if (env.JOB_NAME == 'bdgeo-main') {
+                echo "OK: build ${env.BUILD_NUMBER} desplegado."
+            } else {
+                echo "OK: validación ${env.JOB_NAME} #${env.BUILD_NUMBER} aprobada; producción no fue modificada."
+            }
         }
+    }
+
+    failure {
+        echo "FALLO: el pipeline se detuvo y NO se desplegó la versión ${env.BUILD_NUMBER}. La versión anterior sigue activa."
     }
 }
