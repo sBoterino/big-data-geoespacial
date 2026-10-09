@@ -1,291 +1,118 @@
-Claro. Te lo paso **completo otra vez**, pero esta vez te recomiendo copiarlo directamente desde aquí al Bloc de notas.
+﻿\# F9 â€” reproducibilidad en el computador de Juan Guillermo
 
-````markdown
-# Evidencia de reproducibilidad — Fase 9
 
-**Estudiante:** Juan Guillermo Echeverri Ramirez  
-**Fecha de ejecución:** 2026-10-09  
-**Commit evaluado:** `77521c7`  
-**Proyecto:** big-data-geoespacial  
 
----
+\- Fecha: 7 de octubre de 2026
 
-## 1. Objetivo
+\- Equipo: Windows, 16 GB de RAM
 
-Validar la reproducibilidad de la solución Big Data geoespacial desde el entorno local, comprobando el funcionamiento de Docker Compose, MongoDB, Dask, Spark y la API, así como la correcta ejecución de los procesos de ingestión, agregación y verificación de resultados.
+\- Git / Docker / Compose:
 
----
+&#x20; - Git 2.53.0.windows.2
 
-## 2. Entorno de ejecución
+&#x20; - Docker 29.8.0, build 88096ef
 
-El proyecto fue ejecutado localmente utilizando Docker Compose sobre Windows con WSL2.
+&#x20; - Docker Compose v5.5.1
 
-### Componentes principales
+\- Commit probado: f67dce0 â€” Merge pull request #8 from sBoterino/docs/guia-fase9
 
-- MongoDB
-- Flask API
-- Dask Scheduler
-- Dask Worker 1
-- Dask Worker 2
-- Spark Master
-- Spark Worker
+\- DuraciÃ³n total: No medida desde el inicio de la prueba.
 
-El commit utilizado durante la validación fue:
 
-```text
-77521c7
-````
 
----
+\## Resultados
 
-## 3. Estado de los servicios
 
-Se ejecutó:
 
-```powershell
-docker compose ps
-```
+\- Compose: Correcto. Las imÃ¡genes de Dask, API, Spark y MongoDB fueron construidas correctamente y los servicios iniciaron.
 
-Los servicios principales quedaron activos correctamente:
+\- `/health`: Correcto. La API respondiÃ³ con `mongo=ok`, `status=ok` y versiÃ³n `latest`.
 
-| Servicio       | Estado       |
-| -------------- | ------------ |
-| API            | Up / healthy |
-| MongoDB        | Up / healthy |
-| Dask Scheduler | Up / healthy |
-| Dask Worker 1  | Up           |
-| Dask Worker 2  | Up           |
-| Spark Master   | Up / healthy |
-| Spark Worker   | Up           |
+\- Dask: Correcto. Se detectaron 2 workers conectados, el cÃ¡lculo distribuido fue correcto y MongoDB reportÃ³ 300 eventos semilla.
 
-La API quedó publicada en el puerto `5000`, el Dashboard de Dask en el puerto `8787` y la interfaz de Spark en el puerto `8081`.
+\- Spark Connector: Correcto. Spark pudo conectarse al clÃºster y leer los 300 documentos semilla desde MongoDB.
 
----
+\- Ingesta y conteos: Correcto. Se procesaron 1.972.121 filas iniciales y se obtuvieron 1.741.828 documentos finales.
 
-## 4. Validación de Dask
+\- Controles de limpieza:
 
-Se ejecutó:
+&#x20; - R1 â€” coordenadas nulas/no numÃ©ricas: 226.028
 
-```powershell
-docker compose run --rm dask-job python check_cluster.py
-```
+&#x20; - R2 â€” coordenadas `(0,0)`: 4.115
 
-La prueba confirmó:
+&#x20; - R3 â€” fuera de rango mundial: 106
 
-* 2 workers de Dask conectados.
-* Ejecución distribuida correcta.
-* Conexión correcta con MongoDB.
-* Existencia de 300 documentos de prueba en MongoDB.
-* Resultado final: `RESULTADO: OK`.
+&#x20; - R4 â€” fuera de NYC: 44
 
----
+&#x20; - R5 â€” fecha/hora invÃ¡lida: 0
 
-## 5. Validación del conector Spark - MongoDB
+&#x20; - R6 â€” ID duplicado: 0
 
-Se ejecutó:
+\- Segunda ingesta: Correcta. El sistema indicÃ³ `Ingesta omitida` porque los 1.741.828 documentos ya correspondÃ­an al dataset con `max\_rows=0`.
 
-```powershell
-docker compose exec -T spark-master /opt/spark/bin/spark-submit /opt/jobs/check_conexion.py
-```
+\- VerificaciÃ³n Spark: Correcta. Las sumas de registros de `spark\_grilla`, `spark\_por\_hora`, `spark\_por\_dia\_semana` y `spark\_por\_mes` coincidieron con 1.741.828. La verificaciÃ³n final terminÃ³ con `RESULTADO: OK`.
 
-La prueba confirmó:
+\- Consultas API: Correctas. `/near` devolviÃ³ 10 resultados y `/spark-results/hotspots` devolviÃ³ 5 resultados.
 
-* Lectura correcta desde MongoDB mediante Spark.
-* 300 documentos de prueba leídos.
-* Categorías de prueba encontradas:
 
-  * `A_times_square`: 120
-  * `B_brooklyn_bridge`: 80
-  * `C_queens`: 100
 
-La conexión Spark-MongoDB funcionó correctamente.
+\## Problemas encontrados y correcciones
+
+
+
+1\. Problema â€” Docker estaba instalado y los comandos `docker` y `docker compose` eran reconocidos, pero `docker run --rm hello-world` inicialmente no podÃ­a conectarse al motor `dockerDesktopLinuxEngine`.
+
+&#x20;  - Causa â€” El motor de Docker Desktop no estaba ejecutÃ¡ndose.
+
+&#x20;  - SoluciÃ³n â€” Se abriÃ³ Docker Desktop, se esperÃ³ a que el motor estuviera disponible y posteriormente se continuÃ³ con las pruebas.
+
+
+
+No se presentaron otros errores que impidieran completar la reproducciÃ³n del sistema.
+
+
+
+\## ConclusiÃ³n
+
+
+
+La reproducciÃ³n del proyecto fue exitosa utilizando el repositorio clonado directamente desde GitHub y la configuraciÃ³n local correspondiente. El sistema pudo construir y levantar los servicios mediante Docker Compose, establecer comunicaciÃ³n entre Dask, Spark y MongoDB, ejecutar la ingesta completa, comprobar la idempotencia y verificar los resultados mediante Spark y la API.
+
+
+
+La prueba permitiÃ³ confirmar que el proyecto puede ser levantado y ejecutado en un equipo diferente utilizando la documentaciÃ³n disponible, sin copiar las carpetas, imÃ¡genes, volÃºmenes ni datos de otro integrante.
 
 ---
 
-## 6. Ingesta y dataset
+## Actualizacion de validacion - 9 de octubre de 2026
 
-La configuración utilizada fue:
+Se realizo una nueva validacion sobre el estado actual del proyecto, commit 77521c7.
 
-```text
-INGEST_MAX_ROWS=0
-```
+### Resultados
 
-Al ejecutar:
+- Docker Compose: servicios principales activos correctamente.
+- API: healthy.
+- MongoDB: healthy.
+- Dask Scheduler: healthy.
+- Dask Workers: 2 workers activos.
+- Spark Master: healthy.
+- Spark Worker: activo.
+- Dask-MongoDB: validado correctamente con 300 eventos semilla.
+- Spark-MongoDB: validado correctamente con 300 documentos semilla.
+- Dataset: 1,741,828 documentos.
+- Agregacion espacial: 1,741,828 registros procesados, 3,246 celdas y suma_n=1,741,828.
+- Agregacion temporal: hora, dia de semana, mes y hora-borough conservaron suma_n=1,741,828.
+- Verificacion Spark: RESULTADO: OK.
+- Hotspot principal: Spark n=5336 y MongoDB n=5337, dentro del margen permitido.
+- API /health: mongo=ok, status=ok, version 8.
+- API /near: 10 resultados.
+- API /spark-results/hotspots: 5 resultados.
 
-```powershell
-docker compose run --rm dask-job python pipeline_ingesta.py
-```
+### Incidencia
 
-el sistema indicó que la ingesta fue omitida debido a que ya existían:
+Inicialmente se intento ejecutar entanas_temporales.py, pero dicho archivo no existe en el proyecto. Se verificaron los archivos disponibles y se ejecuto correctamente gregacion_temporal.py.
 
-```text
-1,741,828 documentos
-```
+### Conclusion
 
-correspondientes al dataset configurado.
+La validacion realizada el 9 de octubre de 2026 fue satisfactoria. Dask, Spark, MongoDB y la API funcionaron correctamente y la verificacion final termino con RESULTADO: OK.
 
-La condición de idempotencia de la ingesta fue respetada.
-
----
-
-## 7. Agregación espacial con Spark
-
-Se ejecutó:
-
-```powershell
-docker compose exec -T spark-master /opt/spark/bin/spark-submit /opt/jobs/agregacion_grilla.py
-```
-
-Resultado principal:
-
-```text
-[grilla] origen=eventos leídos=1741828 celdas=3246 suma_n=1741828
-```
-
-Esto demuestra que Spark procesó los `1,741,828` documentos y que la suma de los registros agrupados por celda coincide con el total de documentos procesados.
-
-La duración registrada fue aproximadamente:
-
-```text
-31.079 segundos
-```
-
----
-
-## 8. Agregación temporal con Spark
-
-Se ejecutó:
-
-```powershell
-docker compose exec -T spark-master /opt/spark/bin/spark-submit /opt/jobs/agregacion_temporal.py
-```
-
-Resultados:
-
-```text
-[temporal] spark_por_hora: 24 filas, suma_n=1741828
-[temporal] spark_por_dia_semana: 7 filas, suma_n=1741828
-[temporal] spark_por_mes: 12 filas, suma_n=1741828
-[temporal] spark_hora_borough: 144 filas, suma_n=1741828
-```
-
-El proceso leyó:
-
-```text
-1,741,828 documentos
-```
-
-y tuvo una duración aproximada de:
-
-```text
-27.183 segundos
-```
-
----
-
-## 9. Verificación de resultados Spark
-
-Se ejecutó:
-
-```powershell
-docker compose exec -T spark-master /opt/spark/bin/spark-submit /opt/jobs/verificar_resultados.py
-```
-
-Resultado:
-
-```text
-[verificar] documentos en eventos: 1741828
-[verificar] OK    suma de n en spark_grilla = 1741828 (esperado 1741828)
-[verificar] OK    suma de n en spark_por_hora = 1741828 (esperado 1741828)
-[verificar] OK    suma de n en spark_por_dia_semana = 1741828 (esperado 1741828)
-[verificar] OK    suma de n en spark_por_mes = 1741828 (esperado 1741828)
-[verificar] OK    hotspot #1 (-14799_8151): Spark n=5336, MongoDB $geoWithin=5337 (margen ±27)
-[verificar] RESULTADO: OK
-```
-
-La verificación confirma que las agregaciones generadas por Spark son consistentes con el total de documentos y que el hotspot principal fue validado contra MongoDB dentro del margen establecido.
-
----
-
-## 10. Validación de la API
-
-Se realizaron las siguientes consultas desde PowerShell:
-
-```powershell
-$health = Invoke-RestMethod http://localhost:5000/health
-$near = Invoke-RestMethod "http://localhost:5000/near?lat=40.758&lon=-73.9855&radio=1000&limit=10"
-$spark = Invoke-RestMethod "http://localhost:5000/spark-results/hotspots?limit=5&orden=ranking&desc=false"
-
-$health
-$near.total_devuelto
-$spark.total_devuelto
-```
-
-Resultado:
-
-```text
-mongo status version
------ ------ -------
-ok    ok     8
-
-10
-5
-```
-
-Se verificó que:
-
-* MongoDB responde correctamente.
-* La API responde con estado `ok`.
-* La versión desplegada corresponde a `8`.
-* La consulta `/near` devolvió 10 resultados.
-* La consulta de hotspots de Spark devolvió 5 resultados.
-
----
-
-## 11. Incidencias encontradas y soluciones
-
-Durante la validación se presentó una incidencia al intentar ejecutar inicialmente:
-
-```powershell
-docker compose exec -T spark-master /opt/spark/bin/spark-submit /opt/jobs/ventanas_temporales.py
-```
-
-El sistema respondió:
-
-```text
-python3: can't open file '/opt/jobs/ventanas_temporales.py': [Errno 2] No such file or directory
-```
-
-Se verificaron los archivos Python disponibles en el proyecto y se identificó que el nombre correcto del trabajo era:
-
-```text
-spark/jobs/agregacion_temporal.py
-```
-
-Se ejecutó nuevamente utilizando:
-
-```powershell
-docker compose exec -T spark-master /opt/spark/bin/spark-submit /opt/jobs/agregacion_temporal.py
-```
-
-La ejecución terminó correctamente.
-
-También se observaron algunos mensajes `WARN` de Spark relacionados con la librería nativa de Hadoop y opciones duplicadas del conector de MongoDB. Estos mensajes no impidieron la ejecución y las pruebas terminaron correctamente.
-
----
-
-## 12. Conclusión
-
-La validación de reproducibilidad de la Fase 9 fue completada satisfactoriamente.
-
-El entorno ejecutó correctamente los componentes de MongoDB, Dask, Spark y la API. Dask reconoció dos workers y pudo comunicarse con MongoDB. Spark pudo leer y procesar los datos almacenados en MongoDB.
-
-Se procesaron y verificaron `1,741,828` documentos. Las agregaciones espaciales y temporales conservaron la correspondencia con el total de documentos y la verificación final terminó con:
-
-```text
-RESULTADO: OK
-```
-
-Finalmente, la API respondió correctamente mediante los endpoints de salud, consulta geoespacial y resultados de Spark.
-
-Por lo anterior, la solución cumplió las pruebas técnicas de reproducibilidad establecidas para la Fase 9.
