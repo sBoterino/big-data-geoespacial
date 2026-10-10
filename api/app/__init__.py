@@ -35,9 +35,18 @@ def create_app(db=None):
             app.config["DB"].command("ping")
             mongo_estado = "ok"
         except Exception as exc:  # noqa: BLE001 - cualquier fallo de conexión cuenta
-            return jsonify(status="error", mongo=f"sin conexión: {type(exc).__name__}",
-                           version=config.APP_VERSION), 503
-        return jsonify(status="ok", mongo=mongo_estado, version=config.APP_VERSION)
+            return jsonify(
+                status="error",
+                mongo=f"sin conexión: {type(exc).__name__}",
+                version=config.APP_VERSION,
+                coleccion=config.MONGO_COLLECTION,
+            ), 503
+        return jsonify(
+                status="ok",
+                mongo=mongo_estado,
+                version=config.APP_VERSION,
+                coleccion=config.MONGO_COLLECTION,
+            )
 
     @app.errorhandler(404)
     def no_encontrado(_):

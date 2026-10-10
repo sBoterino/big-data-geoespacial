@@ -6,6 +6,7 @@ def test_health_ok(client):
     assert r.status_code == 200
     assert r.get_json()["status"] == "ok"
     assert r.get_json()["mongo"] == "ok"
+    assert r.get_json()["coleccion"] == "eventos"
 
 
 def test_health_sin_mongo_devuelve_503(client_sin_mongo):
