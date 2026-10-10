@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v44 (7-oct-2026)
+## Contexto maestro transferible entre IAs — v45 (9-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v45:** F9 cerrada con reproducción y PR de Juan Guillermo. F10 cerrada con
+> informe técnico final de 9 páginas en PDF y Word, diagrama de arquitectura, README actualizado
+> y evidencia F9 reparada. Permanecen el simulacro final y confirmar el registro del dataset.
 >
 > **Cambios en v44:** preparada `docs/guia_fase9_reproducibilidad.md` y corregido el arranque
 > Windows del README para la prueba en el computador de Juan Guillermo. La guía exige clon
@@ -586,9 +590,10 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F6: PR #4 fusionado (89a7498); Gate 6 cerrado con `bdgeo-main` #9 sobre los datos reales.**
 - [x] **F8: benchmark medido en el PC de Santiago (32 corridas válidas, ×1 y ×10 físico); metodología aprobada en la revisión del PR #5.**
 - [x] **F7: PR #6 fusionado; Gate 7 cerrado con `bdgeo-main` #11, API versión 11 desplegada.**
-- [x] **F9 (parcial): ingesta completa reproducida en un segundo computador (PC de Santiago): 1.741.828 documentos en 56,3 s, mismos conteos de limpieza.**
+- [x] **F9: Juan Guillermo reprodujo el sistema en otro computador con secretos propios, carga completa, idempotencia, Spark y API; evidencia fusionada en `main`.**
+- [x] **F10: informe técnico final de 9 páginas, diagrama de arquitectura y README final disponibles en `docs/`.**
 
-**Estado oficial: F0 verificación completa, falta enviar el registro · F1 en curso · F2, F4, F5, F6, F7 y F8 cerradas · API versión 11 desplegada · F9, F10 y F11 pendientes.**
+**Estado oficial: F0 verificación completa, falta confirmar el registro · F2–F10 cerradas · F11 pendiente de simulacro final.**
 
 ---
 
@@ -662,8 +667,8 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 - [x] Hay webhook de GitHub hacia Jenkins, y un test fallido bloquea el deploy (con evidencia).
 - [x] La comparación Dask vs Spark tiene mediciones propias (F8, PR #5: 32 corridas, ×1 y ×10 físico).
 - [x] Hay README, `docker-compose.yml` y `Jenkinsfile` en el repositorio.
-- [ ] El informe tiene 10 páginas o menos.
-- [ ] El historial de commits refleja a todos los integrantes (Sebastián y Santiago sí; falta Juan Guillermo).
+- [x] El informe técnico final tiene 9 páginas e incluye arquitectura, decisiones, consultas y benchmark.
+- [x] El historial de commits refleja a los tres integrantes, incluido el PR de reproducibilidad de Juan Guillermo.
 - [ ] Todos pueden hacer un cambio en vivo y explicar el sistema completo.
 
 ---
@@ -688,17 +693,15 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 # 14. PRÓXIMA ACCIÓN EXACTA
 
-> Actualizado el 6-oct-2026. F2, F4, F5, F6, F7 y F8 están cerradas.
+> Actualizado el 9-oct-2026. F2–F10 están cerradas.
 
-1. **F9 — reproducibilidad.** Fusionar la guía F9; Juan Guillermo clona `main` en su computador
-   y sigue el README sin ayuda verbal. Debe guardar tiempo, checks, carga, idempotencia, Spark y
-   problemas en `fase9_reproducibilidad_juan_2026-10-07.md`, corregir el README si hace falta y
-   abrir un PR con su propia identidad de GitHub.
-2. **F10 — documentación.** README final e informe técnico (≤ 10 páginas) en `docs/informe/`,
-   con arquitectura, decisiones D1–D18, consultas, Spark y benchmark (evidencias F4–F8).
+1. **F11 — simulacro final:** ejecutar desde el PC de Juan un cambio en vivo con rama, prueba,
+   PR, revisión, merge, webhook, Jenkins, despliegue y comprobación de `/health`.
+2. **Entrega:** revisar el PDF de 9 páginas y subir mediante PR el informe, el diagrama, el README
+   y la evidencia F9 corregida.
 3. **F0 — confirmar** que el registro del dataset (`docs/registro_dataset_docente.md`) se envió
    al docente.
-4. **F11 — simulacro (8-oct):** congelar `main`, cambio en vivo por integrante y ronda de
+4. **Preparación oral:** congelar `main`, cambio en vivo por integrante y ronda de
    preguntas cruzadas con `docs/guia_sustentacion.md`.
 
 ---
