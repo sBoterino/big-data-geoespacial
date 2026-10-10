@@ -1,8 +1,12 @@
 # CONTEXT.md — BIG DATA GEOESPACIAL
-## Contexto maestro transferible entre IAs — v45 (9-oct-2026)
+## Contexto maestro transferible entre IAs — v46 (10-oct-2026)
 
 > **Propósito:** contexto, alcance, arquitectura, decisiones, estado y plan del proyecto, para que
 > cualquier IA o integrante continúe exactamente desde donde se dejó, sin inventar decisiones.
+>
+> **Cambios en v46:** informe final fusionado; simulacro de cambio en vivo completado con el campo
+> `coleccion` en `/health`, 30 pruebas aprobadas, PR, revisión, merge y despliegue; creado
+> `docs/runbook_sustentacion.md` con el orden operativo de la presentación y contingencias.
 >
 > **Cambios en v45:** F9 cerrada con reproducción y PR de Juan Guillermo. F10 cerrada con
 > informe técnico final de 9 páginas en PDF y Word, diagrama de arquitectura, README actualizado
@@ -592,8 +596,9 @@ evidencia quedó en `docs/evidencias/`. El siguiente paso es enviar el registro 
 - [x] **F7: PR #6 fusionado; Gate 7 cerrado con `bdgeo-main` #11, API versión 11 desplegada.**
 - [x] **F9: Juan Guillermo reprodujo el sistema en otro computador con secretos propios, carga completa, idempotencia, Spark y API; evidencia fusionada en `main`.**
 - [x] **F10: informe técnico final de 9 páginas, diagrama de arquitectura y README final disponibles en `docs/`.**
+- [x] **F11: simulacro técnico completado con rama, prueba, PR, revisión, merge, Jenkins y verificación de `/health`.**
 
-**Estado oficial: F0 verificación completa, falta confirmar el registro · F2–F10 cerradas · F11 pendiente de simulacro final.**
+**Estado oficial: F0 verificación completa, falta confirmar el registro · F2–F11 cerradas · falta ensayo oral cruzado y entrega.**
 
 ---
 
@@ -693,16 +698,16 @@ Leaflet solo el 7-oct y solo si todo lo obligatorio pasó sus gates.
 
 # 14. PRÓXIMA ACCIÓN EXACTA
 
-> Actualizado el 9-oct-2026. F2–F10 están cerradas.
+> Actualizado el 10-oct-2026. F2–F11 están cerradas.
 
-1. **F11 — simulacro final:** ejecutar desde el PC de Juan un cambio en vivo con rama, prueba,
-   PR, revisión, merge, webhook, Jenkins, despliegue y comprobación de `/health`.
-2. **Entrega:** revisar el PDF de 9 páginas y subir mediante PR el informe, el diagrama, el README
-   y la evidencia F9 corregida.
+1. **Ensayo oral:** seguir `docs/runbook_sustentacion.md` en el PC de Juan y practicar preguntas
+   cruzadas hasta que los tres puedan explicar todos los componentes.
+2. **Entrega:** confirmar que el PDF de 9 páginas, el diagrama, el README y la evidencia F9 estan
+   presentes en `main`.
 3. **F0 — confirmar** que el registro del dataset (`docs/registro_dataset_docente.md`) se envió
    al docente.
-4. **Preparación oral:** congelar `main`, cambio en vivo por integrante y ronda de
-   preguntas cruzadas con `docs/guia_sustentacion.md`.
+4. **Día de la sustentación:** congelar `main` y ejecutar la secuencia de preparación,
+   demostración y contingencias de `docs/runbook_sustentacion.md`.
 
 ---
 

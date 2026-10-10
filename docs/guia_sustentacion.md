@@ -1,11 +1,13 @@
 # Guía viva de sustentación
 
-Última actualización: 7-oct-2026
+Última actualización: 10-oct-2026
 
 Fuente principal: sección 6 del enunciado del docente.
 
 Uso: actualizar este archivo cada vez que aparezca una decisión, prueba, resultado o cambio que
 pueda ser explicado o demostrado durante la sustentación.
+
+Runbook operativo y orden de la exposición: [`runbook_sustentacion.md`](runbook_sustentacion.md).
 
 ## 1. Qué exigirá el docente
 
@@ -44,13 +46,13 @@ seguir el despliegue y explicar por qué está construido así.
 | Benchmark Dask vs Spark | **Cerrado (F8)** | PR #5, `fase8_benchmark_2026-10-05.md` | 32 corridas propias, ×1 y ×10 físico, mismo top 1 en ambos motores, gráficas y limitaciones |
 | Corrección metodológica del benchmark | **Documentada** | D18, `resultados_descartados.csv` | El ×10 lógico estaba sesgado (Dask leía una vez y Spark diez); se repitió con un Parquet físico |
 | GeoJSON e índice 2dsphere | **Validado con carga completa** | Auditoría posterior a `bdgeo-main` #6 | Documento real `Point [-74.00231, 40.59662]`; índices `_id_`, `fecha_1` y `location_2dsphere` |
-| Modificación puntual en vivo | **Preparación lista; práctica pendiente** | Pipeline operativo | Endpoints y Spark ya existen; falta ensayar el cambio con rama, PR, merge y Jenkins (simulacro del 8-oct) |
+| Modificación puntual en vivo | **Simulacro completado** | Rama `simulacro/health-coleccion` | Se añadió `coleccion` a `/health`, se aprobaron 30 pruebas, se usó PR, revisión, merge y Jenkins |
 | Consulta con otro polígono | **Validada con semilla y datos reales** | `fase5_semilla_2026-10-04.md`, `fase5_datos_reales_2026-10-04.md` | `/within` recibe cualquier `Polygon` GeoJSON válido; cambiar el polígono no exige cambiar código |
 | Pruebas de consultas API | **Gate 7 cerrado** | `bdgeo-fase7-test` #1/#2/#4 y `bdgeo-main` #11 | 30 pruebas API, 5 de ingesta, 4 de Spark, staging 120/120/120 + 7/57/23 y API v11 desplegada |
 | Pruebas puras de Spark | **Aprobadas en Jenkins** | `bdgeo-fase7-test` #1, `spark/tests/test_agregaciones.py` | 4 pruebas de grilla, GeoJSON `[lon, lat]`, sumas, ranking, temporal y Haversine en 6,251 s |
 | Staging seguro en ramas | **Demostrado** | `bdgeo-fase7-test` #1 | Usa `eventos_semilla` y `spark_semilla_*`; staging pasó y `Despliegue` fue omitido, sin cambiar producción |
 | Bloqueo con pipeline final | **Demostrado** | `bdgeo-fase7-test` #2 | `FORZAR_FALLO=true`: 30 aprobadas, 1 fallo intencional; Kaggle, servicios, integración, Spark, staging y deploy omitidos |
-| Reproducibilidad en otro PC | **Guía lista; ejecución de Juan pendiente** | `docs/guia_fase9_reproducibilidad.md` | Clon limpio, secretos propios, carga/idempotencia, Spark, API, tiempo y PR firmado por Juan |
+| Reproducibilidad en otro PC | **Completada** | `docs/evidencias/fase9_reproducibilidad_juan_2026-10-07.md` | Juan usó un clon limpio y secretos propios; validó carga, idempotencia, Spark, API y PR |
 | Rendimiento de consultas | **Medido** | `fase5_datos_reales_2026-10-04.md` | Promedios calientes: `$near` 13,493 ms, `$geoWithin` 99,531 ms y `$geoNear` simple 182,280 ms; agrupado 1.786,176 ms |
 | Dominio integral de los tres miembros | **Pendiente de ensayo** | — | Cada integrante debe practicar preguntas y hacer cambios fuera de su componente principal |
 
