@@ -7,13 +7,13 @@ Equipo: Juan Guillermo Echeverri, Sebastián Botero Velásquez y Santiago Villam
 
 Repositorio: https://github.com/sBoterino/big-data-geoespacial
 
-> Estado: **F2, F4, F5, F6, F7 (`bdgeo-main` #11, API v11) y F8 cerradas; continúan la reproducibilidad F9, el informe F10 y el simulacro F11**.
+> Estado: **implementacion, pruebas, benchmark y reproducibilidad en un segundo computador completados**. El informe tecnico final esta disponible en [PDF](docs/informe_tecnico_big_data_geoespacial.pdf) y en [Word](docs/informe_tecnico_big_data_geoespacial.docx).
 > Guía de la Fase 2 en [`docs/guia_fase2.md`](docs/guia_fase2.md) · reproducibilidad F9 en [`docs/guia_fase9_reproducibilidad.md`](docs/guia_fase9_reproducibilidad.md) · plan completo en [`docs/plan_paso_a_paso.md`](docs/plan_paso_a_paso.md) · preparación viva en [`docs/guia_sustentacion.md`](docs/guia_sustentacion.md).
 
 ## Dataset
 
 **NYC Motor Vehicle Collisions – Crashes**
-(`muzammilrizvi1/motor-vehicle-collisions-crashes`), pendiente de registro con el docente.
+(`muzammilrizvi1/motor-vehicle-collisions-crashes`), perfilado y utilizado por el proyecto.
 
 Verificación real del 1-oct-2026: 1.972.121 registros, 29 columnas y 420.704.526 bytes.
 El perfilado encontró 226.028 coordenadas nulas, 4.115 puntos `(0,0)`, 106 coordenadas fuera
@@ -101,6 +101,14 @@ benchmark/    Comparación Dask vs Spark
 scripts/      Verificación del dataset, generador de semilla, smoke tests de la API
 docs/         Decisiones, evidencias e informe
 ```
+
+## Entregables
+
+- Informe tecnico final: [`docs/informe_tecnico_big_data_geoespacial.pdf`](docs/informe_tecnico_big_data_geoespacial.pdf) (9 paginas).
+- Version editable: [`docs/informe_tecnico_big_data_geoespacial.docx`](docs/informe_tecnico_big_data_geoespacial.docx).
+- Diagrama de arquitectura: [`docs/informe_assets/arquitectura.png`](docs/informe_assets/arquitectura.png).
+- Orquestacion: [`docker-compose.yml`](docker-compose.yml).
+- Pipeline CI/CD: [`Jenkinsfile`](Jenkinsfile).
 
 ## Endpoints
 

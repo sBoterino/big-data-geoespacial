@@ -25,6 +25,7 @@ venv/
 .coverage
 htmlcov/
 *.egg-info/
+tmp/
 
 # --- Spark / Dask ---
 spark-warehouse/
